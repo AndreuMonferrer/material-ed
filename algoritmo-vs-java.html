@@ -63,7 +63,8 @@
   }
 
   .code-box {
-    background: #1e293b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     overflow-x: auto;
     margin: 12px 0;
@@ -71,10 +72,11 @@
     font-size: 13px;
   }
   .code-header {
-    color: #94a3b8;
+    color: #64748b;
     padding: 8px 16px;
     font-size: 12px;
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f1f5f9;
   }
   .code-box table {
     border-collapse: collapse;
@@ -84,18 +86,20 @@
     padding: 1px 10px;
     white-space: pre;
     vertical-align: top;
+    color: #1e293b;
   }
   .ln {
-    color: #64748b;
+    color: #94a3b8;
     text-align: right;
     user-select: none;
     width: 30px;
+    border-right: 1px solid #e2e8f0;
   }
-  .kw   { color: #60a5fa; }   /* palabras clave: public, class, static, int, if, for, return, void */
-  .type { color: #5eead4; }   /* tipos: String, int[] */
-  .str  { color: #fca5a5; }   /* cadenas de texto */
-  .cmt  { color: #64748b; font-style: italic; }  /* comentarios */
-  .fn   { color: #fde68a; }   /* nombres de metodo/clase */
+  .kw   { color: #2563eb; font-weight: 600; }  /* palabras clave: public, class, static, int, if, for, return, void */
+  .type { color: #0d9488; }                    /* tipos: String, int[] */
+  .str  { color: #b91c1c; }                     /* cadenas de texto */
+  .cmt  { color: #94a3b8; font-style: italic; }  /* comentarios */
+  .fn   { color: #92400e; }                      /* nombres de metodo/clase */
 
   code.inline {
     background: #e2e8f0;
@@ -146,7 +150,7 @@
           <tr><td class="ln">2</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">static</span> <span class="type">int</span> <span class="fn">maximo</span>(<span class="type">int</span>[] a) {</td></tr>
           <tr><td class="ln">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">int</span> max = a[0];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// candidato inicial: el primer elemento</span></td></tr>
           <tr><td class="ln">4</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> (<span class="type">int</span> i = 1; i &lt; a.length; i++) { <span class="cmt">// recorremos desde el segundo</span></td></tr>
-          <tr><td class="ln">5</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (a[i] &gt; max) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// ¿este supera al candidato actual?</span></td></tr>
+          <tr><td class="ln">5</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (a[i] &gt; max) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// ¿este supera al candidato?</span></td></tr>
           <tr><td class="ln">6</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max = a[i];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// sí → nuevo candidato</span></td></tr>
           <tr><td class="ln">7</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
           <tr><td class="ln">8</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
@@ -191,3 +195,4 @@
 
 </body>
 </html>
+
