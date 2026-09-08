@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Escritorio, Web y Móvil</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    margin: 0;
+    padding: 16px;
+    background: transparent;
+  }
+  .contenedor { max-width: 720px; margin: 0 auto; }
+  .pestanas { display: flex; gap: 8px; }
+  .pestana {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border: none; border-radius: 10px 10px 0 0;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    background: #f1f1f4; color: #555;
+  }
+  .pestana[data-tab="escritorio"].activa { background: #2563eb; color: #ffffff; }
+  .pestana[data-tab="web"].activa        { background: #22c55e; color: #ffffff; }
+  .pestana[data-tab="movil"].activa      { background: #a855f7; color: #ffffff; }
+
+  .panel {
+    border: 2px solid #2563eb;
+    border-radius: 0 12px 12px 12px;
+    padding: 22px 26px;
+    background: #eff6ff;
+  }
+  .panel[data-color="web"]   { border-color: #22c55e; background: #f0fdf4; }
+  .panel[data-color="movil"] { border-color: #a855f7; background: #faf5ff; }
+
+  .contenido-tab { display: none; color: #1f2937; line-height: 1.7; font-size: 15px; }
+  .contenido-tab.activo { display: block; }
+
+  .lista { list-style: none; padding: 0; margin: 8px 0 0 0; }
+  .lista li { margin-bottom: 6px; padding-left: 4px; }
+  .ok  { color: #16a34a; margin-right: 6px; }
+  .bad { color: #dc2626; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<div class="contenedor">
+  <div class="pestanas">
+    <button class="pestana" data-tab="escritorio">🖥️ Escritorio</button>
+    <button class="pestana" data-tab="web">🌐 Web</button>
+    <button class="pestana" data-tab="movil">📱 Móvil</button>
+  </div>
+
+  <div class="panel" id="panel">
+
+    <div class="contenido-tab" id="contenido-escritorio">
+      <p>Se instalan en el ordenador y se ejecutan localmente.</p>
+      <p><strong>Ejemplos:</strong> Microsoft Word, IntelliJ IDEA, Photoshop, VLC, Minecraft.</p>
+      <p><strong>Características:</strong></p>
+      <ul class="lista">
+        <li><span class="ok">✅</span>Acceso directo al sistema de archivos del usuario</li>
+        <li><span class="ok">✅</span>Usan toda la potencia del hardware local</li>
+        <li><span class="ok">✅</span>Funcionan sin conexión a internet</li>
+        <li><span class="bad">❌</span>Hay que instalarlas y actualizarlas en cada equipo</li>
+      </ul>
+    </div>
+
+    <div class="contenido-tab" id="contenido-web">
+      <p>Se ejecutan en un servidor; el usuario accede con el navegador.</p>
+      <p><strong>Ejemplos:</strong> Gmail, GitHub, campus virtual, cualquier tienda online.</p>
+      <p><strong>Características:</strong></p>
+      <ul class="lista">
+        <li><span class="ok">✅</span>Accesibles desde cualquier dispositivo con navegador</li>
+        <li><span class="ok">✅</span>No requieren instalación en el equipo del usuario</li>
+        <li><span class="bad">❌</span>Requieren conexión a internet</li>
+        <li><span class="bad">❌</span>Sin acceso al sistema de archivos local del usuario</li>
+      </ul>
+    </div>
+
+    <div class="contenido-tab" id="contenido-movil">
+      <p>Se ejecutan en smartphones o tablets.</p>
+      <p><strong>Ejemplos:</strong> Instagram, Google Maps, la app de tu banco.</p>
+      <p><strong>Características:</strong></p>
+      <ul class="lista">
+        <li><span class="ok">✅</span>Acceso a sensores del dispositivo (GPS, cámara, acelerómetro)</li>
+        <li><span class="ok">✅</span>Notificaciones push</li>
+        <li><span class="bad">❌</span>Pantalla pequeña y recursos más limitados</li>
+        <li><span class="bad">❌</span>Hay que publicarlas en una tienda (Play Store / App Store)</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function mostrarPestana(nombre) {
+    document.querySelectorAll('.pestana').forEach(function(btn) {
+      btn.classList.remove('activa');
+    });
+    document.querySelectorAll('.contenido-tab').forEach(function(div) {
+      div.classList.remove('activo');
+    });
+    document.querySelector('.pestana[data-tab="' + nombre + '"]').classList.add('activa');
+    document.getElementById('contenido-' + nombre).classList.add('activo');
+    document.getElementById('panel').setAttribute('data-color', nombre);
+  }
+
+  document.querySelectorAll('.pestana').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      mostrarPestana(btn.getAttribute('data-tab'));
+    });
+  });
+
+  mostrarPestana('escritorio');
+</script>
+
+</body>
+</html>
