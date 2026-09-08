@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Algoritmo vs Programa en Java</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    margin: 0;
+    padding: 16px;
+    background: transparent;
+  }
+  .contenedor {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .pestanas {
+    display: flex;
+    gap: 8px;
+  }
+  .pestana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #f1f1f4;
+    color: #555;
+  }
+  .pestana[data-tab="algoritmo"].activa { background: #2563eb; color: #ffffff; }
+  .pestana[data-tab="java"].activa      { background: #16a34a; color: #ffffff; }
+
+  .panel {
+    border: 2px solid #2563eb;
+    border-radius: 0 12px 12px 12px;
+    padding: 22px 26px;
+    background: #eff6ff;
+  }
+  .panel[data-color="java"] { border-color: #16a34a; background: #f0fdf4; }
+
+  .contenido-tab { display: none; color: #1f2937; line-height: 1.65; font-size: 15px; }
+  .contenido-tab.activo { display: block; }
+
+  .contenido-tab ol { padding-left: 22px; margin: 10px 0; }
+  .contenido-tab ol > li { margin-bottom: 8px; }
+  .contenido-tab ul.sub { padding-left: 20px; margin: 6px 0; }
+  .contenido-tab ul.sub li { margin-bottom: 4px; }
+
+  .aviso {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: #14532d;
+    font-size: 14px;
+  }
+
+  .code-box {
+    background: #1e293b;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+  }
+  .code-header {
+    color: #94a3b8;
+    padding: 8px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid #334155;
+  }
+  .code-box table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .code-box td {
+    padding: 1px 10px;
+    white-space: pre;
+    vertical-align: top;
+  }
+  .ln {
+    color: #64748b;
+    text-align: right;
+    user-select: none;
+    width: 30px;
+  }
+  .kw   { color: #60a5fa; }   /* palabras clave: public, class, static, int, if, for, return, void */
+  .type { color: #5eead4; }   /* tipos: String, int[] */
+  .str  { color: #fca5a5; }   /* cadenas de texto */
+  .cmt  { color: #64748b; font-style: italic; }  /* comentarios */
+  .fn   { color: #fde68a; }   /* nombres de metodo/clase */
+
+  code.inline {
+    background: #e2e8f0;
+    color: #1e293b;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="contenedor">
+  <div class="pestanas">
+    <button class="pestana" data-tab="algoritmo">💡 Algoritmo</button>
+    <button class="pestana" data-tab="java">☕ Programa en Java</button>
+  </div>
+
+  <div class="panel" id="panel">
+
+    <div class="contenido-tab" id="contenido-algoritmo">
+      <p><strong>Problema:</strong> dada una lista de números, encontrar el mayor.</p>
+      <p><strong>Procedimiento paso a paso:</strong></p>
+      <ol>
+        <li>Toma el primer elemento y guárdalo como "candidato a máximo"</li>
+        <li>Recorre el resto de la lista de izquierda a derecha</li>
+        <li>Por cada elemento: ¿es mayor que el candidato actual?
+          <ul class="sub">
+            <li><strong>Sí</strong> → ese elemento se convierte en el nuevo candidato</li>
+            <li><strong>No</strong> → sigue adelante sin cambiar nada</li>
+          </ul>
+        </li>
+        <li>Al terminar, el candidato es el máximo</li>
+      </ol>
+      <p><strong>¿Por qué funciona?</strong> En todo momento el candidato es el mayor de los elementos vistos hasta ese punto. Al recorrer toda la lista, el candidato es el mayor de todos.</p>
+    </div>
+
+    <div class="contenido-tab" id="contenido-java">
+      <div class="aviso">
+        ℹ️ <span>Si aún no conoces Java, no te preocupes. Lo importante es ver cómo cada paso del algoritmo se convierte en una línea de código. Lee los comentarios.</span>
+      </div>
+
+      <div class="code-box">
+        <div class="code-header">Java</div>
+        <table>
+          <tr><td class="ln">1</td><td><span class="kw">public</span> <span class="kw">class</span> <span class="fn">MaximoLista</span> {</td></tr>
+          <tr><td class="ln">2</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">static</span> <span class="type">int</span> <span class="fn">maximo</span>(<span class="type">int</span>[] a) {</td></tr>
+          <tr><td class="ln">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">int</span> max = a[0];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// candidato inicial: el primer elemento</span></td></tr>
+          <tr><td class="ln">4</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> (<span class="type">int</span> i = 1; i &lt; a.length; i++) { <span class="cmt">// recorremos desde el segundo</span></td></tr>
+          <tr><td class="ln">5</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (a[i] &gt; max) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// ¿este supera al candidato?</span></td></tr>
+          <tr><td class="ln">6</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max = a[i];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// sí → nuevo candidato</span></td></tr>
+          <tr><td class="ln">7</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+          <tr><td class="ln">8</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+          <tr><td class="ln">9</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> max;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// devolvemos el mayor encontrado</span></td></tr>
+          <tr><td class="ln">10</td><td>&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+          <tr><td class="ln">11</td><td>&nbsp;</td></tr>
+          <tr><td class="ln">12</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {</td></tr>
+          <tr><td class="ln">13</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">int</span>[] numeros = {6, 7, 8, 5, 9};</td></tr>
+          <tr><td class="ln">14</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(<span class="str">"Máximo = "</span> + maximo(numeros)); <span class="cmt">// → Máximo = 9</span></td></tr>
+          <tr><td class="ln">15</td><td>&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+          <tr><td class="ln">16</td><td>}</td></tr>
+        </table>
+      </div>
+
+      <p>Fíjate en la correspondencia directa: el "candidato" es <code class="inline">max</code>, el "recorrer" es el <code class="inline">for</code>, la "comparación" es el <code class="inline">if</code>, la "sustitución" es <code class="inline">max = a[i]</code>.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function mostrarPestana(nombre) {
+    document.querySelectorAll('.pestana').forEach(function(btn) {
+      btn.classList.remove('activa');
+    });
+    document.querySelectorAll('.contenido-tab').forEach(function(div) {
+      div.classList.remove('activo');
+    });
+    document.querySelector('.pestana[data-tab="' + nombre + '"]').classList.add('activa');
+    document.getElementById('contenido-' + nombre).classList.add('activo');
+    document.getElementById('panel').setAttribute('data-color', nombre);
+  }
+
+  document.querySelectorAll('.pestana').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      mostrarPestana(btn.getAttribute('data-tab'));
+    });
+  });
+
+  mostrarPestana('algoritmo');
+</script>
+
+</body>
+</html>
