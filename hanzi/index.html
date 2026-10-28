@@ -88,6 +88,13 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .link{background:none;border:0;color:var(--muted);text-decoration:underline;font:inherit;cursor:pointer;padding:4px}
 .foot{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px;font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.mode b{font-size:15px}
+.mode span{font-size:12px;color:var(--muted);line-height:1.35}
+.mode[aria-pressed="true"]{border-color:var(--jade);background:var(--jade-soft)}
+.bigspk{width:96px;height:96px;border-radius:50%;border:0;background:var(--jade);color:var(--surface);display:grid;place-items:center;cursor:pointer}
+.opt.pyopt{font-size:20px;font-weight:600;letter-spacing:.02em}
 .dots{display:flex;gap:4px}
 .dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
 .dots span.on{background:var(--jade)}
@@ -478,12 +485,28 @@ function cards(newCard){
 }
 
 /* ---------- Test ---------- */
-const DIRS={hm:"汉字 → significado",mh:"significado → 汉字",hp:"汉字 → pinyin"};
+const DIRS={ht:["Tonos","Ves el 汉字 y eliges el pinyin con los tonos correctos"],hm:["Significado","Ves el 汉字 y eliges qué significa"],au:["Escucha","Oyes la palabra y eliges el 汉字"],mh:["Al revés","Ves el significado y eliges el 汉字"]};
+if(!DIRS[S.dir])S.dir="ht";
+const TONES={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù","ü":"ǖǘǚǜ"};
+const REV={};for(const[b,m]of Object.entries(TONES))[...m].forEach((c,i)=>REV[c]=[b,i+1]);
+function toneVariants(p){
+  const ch=[...p];let pos=[],orig=[];
+  ch.forEach((c,i)=>{if(REV[c]){pos.push(i);orig.push(REV[c][1])}});
+  const base=ch.slice();pos.forEach(i=>base[i]=REV[ch[i]][0]);
+  if(!pos.length){const low=p.toLowerCase();let i=low.search(/[ae]/);if(i<0)i=low.indexOf("ou");
+    if(i<0)for(let k=ch.length-1;k>=0;k--)if("iouü".includes(low[k])){i=k;break}
+    if(i<0)return[];pos=[i];orig=[0]}
+  const n=pos.length,combos=[];
+  for(let c=0;c<4**n;c++){const t=[];let x=c;for(let k=0;k<n;k++){t.push(x%4+1);x=Math.floor(x/4)}if(t.join()!==orig.join())combos.push(t)}
+  return shuffle(combos).slice(0,3).map(t=>{const a=base.slice();pos.forEach((i,k)=>{const b=a[i],low=b.toLowerCase(),m=TONES[low][t[k]-1];a[i]=b===low?m:m.toUpperCase()});return a.join("")});
+}
+const bigIcon=icon.replace('width="20" height="20"','width="44" height="44"');
+const noZhVoice=()=>{try{const v=speechSynthesis.getVoices();return v.length>0&&!v.some(x=>/^zh|cmn/i.test(x.lang))}catch(e){return true}};
 function startTest(words,label,key){
   S.run={words:shuffle(words.map(w=>w.h)),pos:0,label,key,wrong:[],ok:0,dir:S.dir};save();answered=false;render()}
 function quizSetup(){
   const lvls=S.level?[S.level]:[1,2];
-  let h=`<h2>Tipo de pregunta</h2><div class="seg small" id="dirSeg">${Object.entries(DIRS).map(([k,v])=>`<button data-dir="${k}" aria-pressed="${S.dir===k}">${v}</button>`).join("")}</div>`;
+  let h=`<h2>Modo del test</h2><div class="modes" id="dirSeg">${Object.entries(DIRS).map(([k,v])=>`<button class="mode" data-dir="${k}" aria-pressed="${S.dir===k}"><b>${v[0]}</b><span>${v[1]}</span></button>`).join("")}</div>`;
   const nf=Object.keys(S.fails).length;
   if(nf)h+=`<button class="btn no wide" id="failTest">Test de mis fallos (${nf})</button>`;
   for(const lv of lvls){
@@ -501,26 +524,35 @@ function quizSetup(){
 function startFailTest(){startTest(Object.keys(S.fails).map(h=>BY[h]).filter(Boolean),"Mis fallos","fails")}
 function quizQuestion(){
   const R=S.run,w=BY[R.words[R.pos]];cur=w;
-  const field=R.dir==="hp"?"p":R.dir==="mh"?"h":"m";
-  const src=ALL.filter(x=>x.lv===w.lv);const opts=[w],seen=new Set([w[field]]);let g=0;
-  while(opts.length<4&&g++<300){const o=src[Math.floor(Math.random()*src.length)];if(!seen.has(o[field])){seen.add(o[field]);opts.push(o)}}
-  const O=shuffle(opts);
-  const q=R.dir==="mh"?`<div class="prompt">${esc(w.m)}</div><div class="hint">Elige el carácter</div>`
-    :`<div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="hint">${R.dir==="hp"?"¿Cómo se pronuncia?":"¿Qué significa?"}</div>`;
-  stage.innerHTML=`<div class="top"><span class="hint" style="text-align:left"><b>${esc(R.label)}</b> · ${R.pos+1}/${R.words.length}</span><button class="link" id="quit">Salir</button></div>
+  if(!DIRS[R.dir])R.dir="ht";const d=R.dir;
+  let O,cls="";
+  const tv=d==="ht"?toneVariants(w.p):[];
+  if(d==="ht"&&tv.length){O=shuffle([{t:w.p,good:true},...tv.map(t=>({t,good:false}))]);cls="pyopt"}
+  else{
+    const field=d==="mh"||d==="au"?"h":d==="ht"?"p":"m";if(field==="h")cls="hz";else if(field==="p")cls="pyopt";
+    const src=ALL.filter(x=>x.lv===w.lv);const opts=[w],seen=new Set([w[field]]);let g=0;
+    while(opts.length<4&&g++<300){const o=src[Math.floor(Math.random()*src.length)];if(!seen.has(o[field])){seen.add(o[field]);opts.push(o)}}
+    O=shuffle(opts).map(o=>({t:o[field],good:o===w}));
+  }
+  let q;
+  if(d==="mh")q=`<div class="prompt">${esc(w.m)}</div><div class="hint">Elige el carácter</div>`;
+  else if(d==="au")q=`<button class="bigspk" data-say="${w.h}" aria-label="Volver a escuchar">${bigIcon}</button><div class="hint">Escucha y elige la palabra. Toca el botón para repetir.</div>${noZhVoice()?`<div class="hint" style="color:var(--seal)">Tu móvil no tiene voz en chino. Instálala en Ajustes → Idioma → Texto a voz.</div>`:""}`;
+  else q=`<div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="hint">${d==="ht"?"Elige el pinyin con los tonos correctos":"¿Qué significa?"}</div>`;
+  stage.innerHTML=`<div class="top"><span class="hint" style="text-align:left"><b>${esc(R.label)}</b> · ${DIRS[d][0]} · ${R.pos+1}/${R.words.length}</span><button class="link" id="quit">Salir</button></div>
     <div class="bar" style="margin:8px 0 12px"><i style="width:${R.pos/R.words.length*100}%"></i></div>
-    <div class="card" style="min-height:230px"><span class="lvl">HSK ${w.lv}</span>${spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
-    <div class="row" style="margin-top:12px">${O.map((o,i)=>`<button class="btn opt ${field==="h"?"hz":""}" data-i="${i}">${esc(o[field])}</button>`).join("")}</div>
+    <div class="card" style="min-height:230px"><span class="lvl">HSK ${w.lv}</span>${d==="au"?"":spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
+    <div class="row" style="margin-top:12px">${O.map((o,i)=>`<button class="btn opt ${cls}" data-i="${i}">${esc(o.t)}</button>`).join("")}</div>
     <button class="btn yes wide" id="nextBtn" style="margin-top:10px" hidden>Siguiente</button>`;
+  if(d==="au")speak(w.h);
   $("quit").onclick=()=>{S.run=null;save();render()};
   stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     if(answered)return;answered=true;
-    const good=O[+b.dataset.i]===w;grade(w,good);
+    const good=O[+b.dataset.i].good;grade(w,good);
     if(good){R.ok++;if(R.key==="fails"||S.fails[w.h]){delete S.fails[w.h]}}else R.wrong.push(w.h);
     save();updateBadge();
-    stage.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(O[+x.dataset.i]===w)x.classList.add("ok")});
+    stage.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(O[+x.dataset.i].good)x.classList.add("ok")});
     if(!good)b.classList.add("bad");
-    $("after").innerHTML=`<div class="py">${esc(w.p)}</div>${R.dir==="mh"?"":`<div class="mean">${esc(w.m)}</div>`}`;
+    $("after").innerHTML=`${d==="au"?`<div class="han ${w.h.length>2?"long":""}" style="font-size:56px">${w.h}</div>`:""}<div class="py">${esc(w.p)}</div>${d==="mh"?"":`<div class="mean">${esc(w.m)}</div>`}`;
     speak(w.h);stats();
     const nb=$("nextBtn");nb.hidden=false;nb.focus();
     nb.onclick=()=>{R.pos++;answered=false;save();render()};
