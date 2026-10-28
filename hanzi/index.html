@@ -95,6 +95,30 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
 .mode[aria-pressed="true"]{border-color:var(--jade);background:var(--jade-soft)}
 .bigspk{width:96px;height:96px;border-radius:50%;border:0;background:var(--jade);color:var(--surface);display:grid;place-items:center;cursor:pointer}
 .opt.pyopt{font-size:20px;font-weight:600;letter-spacing:.02em}
+#modeSeg button{font-size:13px;padding:9px 2px}
+.stories{display:flex;flex-direction:column;gap:10px}
+.story{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 16px;display:grid;gap:3px;font:inherit;color:var(--ink);cursor:pointer;position:relative}
+.story .zh{font-family:var(--han);font-size:22px;font-weight:700}
+.story .meta{font-size:12px;color:var(--muted)}
+.story .meta em{color:var(--jade);font-style:normal;font-weight:700}
+.tag{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.story .tag{position:absolute;top:14px;right:16px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 14px;font:600 13px var(--ui);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.text{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 14px;display:flex;flex-direction:column;gap:16px}
+.sent{display:grid;grid-template-columns:1fr auto;gap:2px 6px;align-items:start}
+.zhline{font-family:var(--han);font-size:24px;line-height:2.2;min-width:0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.nopy .zhline{line-height:1.7}
+ruby.w{cursor:pointer;border-radius:5px;padding:0 1px;-webkit-tap-highlight-color:transparent}
+ruby.w.sel{background:var(--jade-soft)}
+ruby.w.saved{text-decoration:underline dotted var(--seal);text-underline-offset:5px}
+rt{font-family:var(--ui);font-size:12px;color:var(--jade);font-weight:600;letter-spacing:0}
+.nopy rt{display:none}
+.tr{grid-column:1/-1;font-size:14px;color:var(--muted);line-height:1.45}
+.notr .tr{display:none}
+#sheetBg{position:fixed;inset:0;background:rgba(10,15,12,.4);z-index:20}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding-top:22px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
 .dots{display:flex;gap:4px}
 .dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
 .dots span.on{background:var(--jade)}
@@ -112,6 +136,7 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
   <div class="seg" id="modeSeg" role="group" aria-label="Sección">
     <button id="mCards" data-mode="cards">Tarjetas</button>
     <button id="mQuiz" data-mode="quiz">Test</button>
+    <button id="mRead" data-mode="read">Lecturas</button>
     <button id="mFails" data-mode="fails">Fallos<span class="badge" id="failBadge" hidden>0</span></button>
   </div>
   <div class="seg" id="levelSeg" role="group" aria-label="Nivel">
@@ -123,6 +148,18 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
   <main id="stage"></main>
   <div class="stats" id="stats"></div>
   <p class="foot" id="foot">Tu progreso se guarda en este móvil.<br><button class="link" id="reset">Borrar todo el progreso</button><span id="confirmWrap" hidden> ¿Seguro? <button class="link" id="resetYes">Sí, borrar</button></span></p>
+</div>
+<div id="sheetBg" hidden></div>
+<div id="sheet" hidden role="dialog" aria-label="Palabra">
+  <button class="x" id="sheetClose" style="position:absolute;top:8px;right:8px;font-size:20px" aria-label="Cerrar">✕</button>
+  <span class="tag" id="shTag"></span>
+  <div class="han" id="shHan" style="font-size:64px"></div>
+  <div class="py" id="shPy"></div>
+  <div class="mean" id="shMean"></div>
+  <div class="row" style="width:100%;margin-top:6px">
+    <button class="btn" id="shSay">Escuchar</button>
+    <button class="btn yes" id="shSave">Guardar para estudiar</button>
+  </div>
 </div>
 
 <script>
@@ -432,6 +469,91 @@ const RAW2=`吧|ba|partícula de sugerencia
 const parse=(raw,lv)=>raw.trim().split("\n").map((l,i)=>{const [h,p,m]=l.split("|");return {h,p,m,lv,i}});
 const L1=parse(RAW1,1),L2=parse(RAW2,2),ALL=[...L1,...L2];
 const BY={};ALL.forEach(w=>BY[w.h]=w);
+const EXTRA={小明:["Xiǎo Míng","Xiaoming (nombre)"],王方:["Wáng Fāng","Wang Fang (nombre)"],只:["zhī","clasificador de animales"],星期六:["xīngqīliù","sábado"],一些:["yìxiē","algunos, un poco de"],三十:["sānshí","treinta"],见:["jiàn","ver, verse"],你们:["nǐmen","vosotros, ustedes"],八十:["bāshí","ochenta"],天:["tiān","día"],后:["hòu","después"],先:["xiān","primero, antes"],回来:["huílai","volver"],杯:["bēi","vaso (clasificador)"],半:["bàn","media, mitad"],二十:["èrshí","veinte"],饭:["fàn","comida, arroz"],十一:["shíyī","once"],同学们:["tóngxuémen","compañeros de clase"],蛋糕:["dàngāo","tarta, pastel"],冬天:["dōngtiān","invierno"],上海:["Shànghǎi","Shanghái"],出去:["chūqu","salir"],明年:["míngnián","el año que viene"],舒服:["shūfu","cómodo, encontrarse bien"],点儿:["diǎnr","un poco"]};
+for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
+const STORIES=[
+{id:"h1-familia",lv:1,t:"我的家",es:"Mi familia",s:[
+["我 叫 小明 。","Me llamo Xiaoming."],
+["我 是 中国 人 ， 我 家 在 北京 。","Soy chino y mi casa está en Pekín."],
+["我 家 有 三 个 人 ： 爸爸 、 妈妈 和 我 。","En mi familia somos tres: papá, mamá y yo."],
+["我 爸爸 是 医生 ， 他 在 医院 工作 。","Mi padre es médico y trabaja en un hospital."],
+["我 妈妈 是 老师 ， 她 很 喜欢 她 的 学生 。","Mi madre es profesora y quiere mucho a sus alumnos."],
+["我 是 学生 ， 我 在 学校 学习 。","Yo soy estudiante y estudio en la escuela."],
+["我们 家 有 一=yì 只 小 猫 。","En casa tenemos un gatito."],
+["我 很 爱 我 的 家 。","Quiero mucho a mi familia."]]},
+{id:"h1-tienda",lv:1,t:"去商店",es:"De compras",s:[
+["今天 是 星期六 。","Hoy es sábado."],
+["上午 ， 我 和 妈妈 去 商店 买 东西 。","Por la mañana voy con mamá a la tienda a comprar cosas."],
+["商店 里 有 很 多 人 。","En la tienda hay mucha gente."],
+["妈妈 想 买 一些 水果 。","Mamá quiere comprar algo de fruta."],
+["她 买 了 五 个 苹果 。","Compra cinco manzanas."],
+["我 想 买 一=yì 本 书 。","Yo quiero comprar un libro."],
+["「 这 本 书 多少 钱 ？ 」","«¿Cuánto cuesta este libro?»"],
+["「 三十 块 。 」","«Treinta yuanes.»"],
+["我 买 了 这 本 书 ， 很 高兴 。","Compro el libro y estoy muy contento."],
+["中午 ， 我们 坐 出租车 回 家 。","A mediodía volvemos a casa en taxi."]]},
+{id:"h1-lluvia",lv:1,t:"下雨了",es:"Está lloviendo",s:[
+["今天 天气 不=bú 太 好 ， 下雨 了 。","Hoy no hace muy buen tiempo: está lloviendo."],
+["我 没有 去 学校 ， 在 家 里 看 书 。","No he ido a la escuela; estoy en casa leyendo."],
+["下午 ， 同学 王方 打电话 来 。","Por la tarde me llama mi compañero Wang Fang."],
+["「 喂 ， 你 在 哪儿 ？ 」","«¿Diga? ¿Dónde estás?»"],
+["「 我 在 家 看 电视 。 你 呢 ？ 」","«Estoy en casa viendo la tele. ¿Y tú?»"],
+["「 我 也 在 家 。 明天 你 想 去 看 电影 吗 ？ 」","«Yo también estoy en casa. ¿Quieres ir mañana a ver una película?»"],
+["「 想 ！ 明天 下午 三 点 我 去 你 家 。 」","«¡Sí! Mañana a las tres de la tarde voy a tu casa.»"],
+["「 好 ， 明天 见 ！ 」","«Vale, ¡hasta mañana!»"]]},
+{id:"h1-restaurante",lv:1,t:"在饭店",es:"En el restaurante",s:[
+["中午 ， 我 和 爸爸 去 饭店 。","A mediodía voy con papá a un restaurante."],
+["饭店 很 小 ， 人 很 多 。","El restaurante es pequeño y hay mucha gente."],
+["服务员 ： 「 你们 想 吃 什么 ？ 」","Camarero: «¿Qué quieren comer?»"],
+["爸爸 ： 「 我们 想 吃 米饭 和 菜 。 」","Papá: «Queremos arroz y unos platos.»"],
+["服务员 ： 「 你们 喝 什么 ？ 」","Camarero: «¿Qué van a beber?»"],
+["我 ： 「 我 想 喝 茶 。 」 爸爸 ： 「 我 喝 水 。 」","Yo: «Quiero té.» Papá: «Yo, agua.»"],
+["菜 很 好吃 ， 我 吃 了 很 多 。","La comida está muy rica y como mucho."],
+["爸爸 说 ： 「 多少 钱 ？ 」 服务员 ： 「 八十 块 。 」","Papá dice: «¿Cuánto es?» Camarero: «Ochenta yuanes.»"],
+["爸爸 说 ： 「 谢谢 ！ 」 服务员 ： 「 不客气 ！ 」","Papá dice: «¡Gracias!» Camarero: «¡De nada!»"]]},
+{id:"h2-dia",lv:2,t:"我的一天",es:"Mi día",s:[
+["我 每 天 早上 六 点 起床 。","Todos los días me levanto a las seis de la mañana."],
+["起床 后 ， 我 先 去 跑步 。","Después de levantarme, primero salgo a correr."],
+["跑步 回来 ， 我 喝 一=yì 杯 牛奶 ， 吃 两 个 鸡蛋 。","Al volver de correr, me tomo un vaso de leche y dos huevos."],
+["七 点 半 ， 我 坐 公共汽车 去 上班 。","A las siete y media cojo el autobús para ir al trabajo."],
+["我 的 公司 离 我 家 不 远 ， 二十 分钟 就 到 了 。","Mi empresa no está lejos de casa: en veinte minutos llego."],
+["我 的 工作 很 忙 ， 但是 我 觉得 很 快乐 。","Mi trabajo es muy ajetreado, pero me siento feliz."],
+["晚上 ， 我 和 妻子 一起 做 饭 。","Por la noche cocino con mi mujer."],
+["吃 完 饭 ， 我们 一起 看 电视 。","Después de cenar vemos la tele juntos."],
+["十一 点 ， 我 就 睡觉 了 。","A las once ya me voy a dormir."]]},
+{id:"h2-cumple",lv:2,t:"生日快乐",es:"Feliz cumpleaños",s:[
+["今天 是 我 妹妹 的 生日 ， 她 八 岁 了 。","Hoy es el cumpleaños de mi hermana pequeña: cumple ocho años."],
+["早上 ， 妈妈 给 她 买 了 一=yí 件 红 衣服 。","Por la mañana, mamá le ha comprado ropa roja."],
+["妹妹 穿 着 新 衣服 ， 非常 高兴 。","Mi hermana lleva la ropa nueva y está contentísima."],
+["下午 ， 她 的 同学们 来 我们 家 玩 。","Por la tarde vienen sus compañeros de clase a jugar a casa."],
+["大家 一起 唱歌 、 跳舞 。","Todos cantan y bailan juntos."],
+["哥哥 送 她 一=yí 个 手表 。","Mi hermano mayor le regala un reloj."],
+["妹妹 笑 着 说 ： 「 谢谢 哥哥 ！ 我 非常 喜欢 ！ 」","Mi hermana dice sonriendo: «¡Gracias, hermano! ¡Me encanta!»"],
+["晚上 ， 我们 一起 吃 了 生日 蛋糕 。","Por la noche comemos juntos la tarta de cumpleaños."],
+["妹妹 说 ， 这 是 她 最 快乐 的 一=yì 天 。","Mi hermana dice que es su día más feliz."]]},
+{id:"h2-viaje",lv:2,t:"去北京旅游",es:"Viaje a Pekín",s:[
+["去年 冬天 ， 我 和 丈夫 去 北京 旅游 了 。","El invierno pasado, mi marido y yo fuimos de viaje a Pekín."],
+["我们 是 坐 飞机 去 的 ， 从 上海 到 北京 两 个 小时 。","Fuimos en avión: de Shanghái a Pekín son dos horas."],
+["北京 的 冬天 很 冷 ， 还 下=xià=caer_(lluvia,_nieve) 了 雪 。","El invierno en Pekín es muy frío, y además nevó."],
+["我们 住 在 一=yí 个 宾馆 里 ， 房间 很 大 ， 也 很 便宜 。","Nos alojamos en un hotel; la habitación era grande y además barata."],
+["每 天 我们 都 出去 玩 。","Salíamos a pasear todos los días."],
+["北京 的 菜 很 好吃 ， 我 最 喜欢 吃 面条 。","La comida de Pekín es muy rica; lo que más me gusta son los fideos."],
+["丈夫 说 他 希望 明年 再 去 一=yí 次 。","Mi marido dice que espera volver el año que viene."],
+["这 次 旅游 ， 我们 都 非常 快乐 。","En este viaje lo pasamos los dos muy bien."]]},
+{id:"h2-medico",lv:2,t:"去医院",es:"En el médico",s:[
+["上=shàng=anterior,_pasado 个 星期 ， 我 生病 了 。","La semana pasada me puse enfermo."],
+["我 觉得 很 累 ， 眼睛 也 不 舒服 。","Me sentía muy cansado y los ojos también me molestaban."],
+["妻子 说 ： 「 你 别 去 上班 了 ， 我们 去 医院 吧 。 」","Mi mujer me dijo: «No vayas a trabajar; vamos al hospital.»"],
+["医生 问 我 ： 「 你 哪儿 不 舒服 ？ 」","El médico me preguntó: «¿Qué le pasa?»"],
+["我 告诉 他 ： 「 我 很 累 ， 不 想 吃 东西 。 」","Le dije: «Estoy muy cansado y no tengo ganas de comer.»"],
+["医生 说 ： 「 不=bú 是 大 问题 ， 吃 点儿 药 ， 多 休息 。 」","El médico dijo: «No es nada grave. Tómese unas medicinas y descanse mucho.»"],
+["我 在 家 休息 了 三 天 ， 每 天 喝 很 多 水 。","Descansé en casa tres días y bebía mucha agua."],
+["现在 我 的 身体 已经 好 了 。","Ahora ya estoy bien."]]}
+];
+const PUNCT="，。：、「」？！";
+function tok(t){if(PUNCT.includes(t))return{pu:t};const [h,p,m]=t.split("=");const d=BY[h];
+  return{h,p:p||(d?d.p:""),m:m?m.replace(/_/g," "):(d?d.m:""),known:!!d}}
+
 const BLOCK=25;
 function blocksOf(list){const n=Math.ceil(list.length/BLOCK),size=Math.ceil(list.length/n),out=[];for(let i=0;i<n;i++)out.push(list.slice(i*size,(i+1)*size));return out}
 const BLOCKS={1:blocksOf(L1),2:blocksOf(L2)};
@@ -442,14 +564,16 @@ for(const href of["https://fonts.googleapis.com/css2?family=Manrope:wght@400;600
 const l=document.createElement("link");l.rel="stylesheet";l.href=href;document.head.appendChild(l)}})();
 
 const KEY="hanzi-hsk12-v1";
-let S={box:{},level:1,mode:"quiz",dir:"hm",fails:{},best:{},run:null};
+let S={box:{},level:1,mode:"quiz",dir:"ht",fails:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardFails:false};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
-if(!S.fails)S.fails={};if(!S.best)S.best={};
+if(!S.fails)S.fails={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 let sess={ok:0,bad:0,streak:0},cur=null,revealed=false,lastH=null,answered=false;
 
 const boxOf=w=>S.box[w.h]||0;
-const pool=()=>ALL.filter(w=>!S.level||w.lv===S.level);
+const failWords=()=>Object.keys(S.fails).map(h=>BY[h]).filter(Boolean);
+const pool=()=>{if(S.mode==="cards"&&S.cardFails){const f=failWords();if(f.length)return f}return ALL.filter(w=>!S.level||w.lv===S.level)};
+const lvTag=w=>w.lv?`HSK ${w.lv}`:"Lectura";
 function grade(w,good){const b=boxOf(w);S.box[w.h]=good?Math.min(4,b+1):0;
   if(good){sess.ok++;sess.streak++}else{sess.bad++;sess.streak=0;S.fails[w.h]=(S.fails[w.h]||0)+1}save()}
 function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
@@ -468,8 +592,8 @@ function pickCard(){const p=pool();let tot=0;const ws=p.map(w=>{const wt=w.h===l
 function cards(newCard){
   if(newCard||!cur){cur=pickCard();lastH=cur.h;revealed=false}
   const w=cur;
-  stage.innerHTML=`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
-    <span class="lvl">HSK ${w.lv}</span>${spk()}
+  stage.innerHTML=(S.cardFails?`<div class="top" style="margin-bottom:10px"><span class="hint" style="text-align:left"><b>Tarjetas · mis fallos</b> (${failWords().length})</span><button class="link" id="cfExit">Salir</button></div>`:"")+`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
+    <span class="lvl">${lvTag(w)}</span>${spk()}
     <div class="han ${w.h.length>2?"long":""}">${w.h}</div>
     ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
   </div>
@@ -477,6 +601,7 @@ function cards(newCard){
     <button class="btn no" id="again" ${revealed?"":"disabled"}>Otra vez</button>
     <button class="btn yes" id="know" ${revealed?"":"disabled"}>La sé</button>
   </div>`;
+  if(S.cardFails)$("cfExit").onclick=()=>{S.cardFails=false;save();cur=null;render()};
   const rev=()=>{if(!revealed){revealed=true;cards();speak(w.h)}};
   $("cardBox").onclick=rev;
   $("cardBox").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();rev()}};
@@ -530,7 +655,7 @@ function quizQuestion(){
   if(d==="ht"&&tv.length){O=shuffle([{t:w.p,good:true},...tv.map(t=>({t,good:false}))]);cls="pyopt"}
   else{
     const field=d==="mh"||d==="au"?"h":d==="ht"?"p":"m";if(field==="h")cls="hz";else if(field==="p")cls="pyopt";
-    const src=ALL.filter(x=>x.lv===w.lv);const opts=[w],seen=new Set([w[field]]);let g=0;
+    const src=w.lv?ALL.filter(x=>x.lv===w.lv):ALL;const opts=[w],seen=new Set([w[field]]);let g=0;
     while(opts.length<4&&g++<300){const o=src[Math.floor(Math.random()*src.length)];if(!seen.has(o[field])){seen.add(o[field]);opts.push(o)}}
     O=shuffle(opts).map(o=>({t:o[field],good:o===w}));
   }
@@ -540,7 +665,7 @@ function quizQuestion(){
   else q=`<div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="hint">${d==="ht"?"Elige el pinyin con los tonos correctos":"¿Qué significa?"}</div>`;
   stage.innerHTML=`<div class="top"><span class="hint" style="text-align:left"><b>${esc(R.label)}</b> · ${DIRS[d][0]} · ${R.pos+1}/${R.words.length}</span><button class="link" id="quit">Salir</button></div>
     <div class="bar" style="margin:8px 0 12px"><i style="width:${R.pos/R.words.length*100}%"></i></div>
-    <div class="card" style="min-height:230px"><span class="lvl">HSK ${w.lv}</span>${d==="au"?"":spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
+    <div class="card" style="min-height:230px"><span class="lvl">${lvTag(w)}</span>${d==="au"?"":spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
     <div class="row" style="margin-top:12px">${O.map((o,i)=>`<button class="btn opt ${cls}" data-i="${i}">${esc(o.t)}</button>`).join("")}</div>
     <button class="btn yes wide" id="nextBtn" style="margin-top:10px" hidden>Siguiente</button>`;
   if(d==="au")speak(w.h);
@@ -581,33 +706,76 @@ function failsView(){
   const list=Object.entries(S.fails).map(([h,c])=>({w:BY[h],c})).filter(x=>x.w).sort((a,b)=>b.c-a.c);
   if(!list.length){stage.innerHTML=`<div class="panel"><div class="empty">Aún no tienes fallos guardados.<br>Cuando falles una palabra en un test o marques "Otra vez" en las tarjetas, aparecerá aquí.</div></div>`;return}
   stage.innerHTML=`<div class="panel">
-    <button class="btn no wide" id="ft">Hacer test de fallos (${list.length})</button>
+    <div class="row"><button class="btn no" id="ft">Test de fallos</button><button class="btn" id="fc">Repasar con tarjetas</button></div>
     <div class="hint" style="text-align:left">Cuando aciertes una palabra en un test, sale de la lista.</div>
     <div class="list">${list.map(({w,c})=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)} <span class="cnt">×${c}</span></div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button><button class="x" data-rm="${w.h}" aria-label="Quitar de la lista">Quitar</button></div></div>`).join("")}</div>
   </div>`;
   $("ft").onclick=()=>{S.mode="quiz";startFailTest()};
+  $("fc").onclick=()=>{S.mode="cards";S.cardFails=true;save();cur=null;render()};
   stage.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{delete S.fails[b.dataset.rm];save();updateBadge();failsView()});
 }
+
+/* ---------- Lecturas ---------- */
+function readList(){
+  const list=STORIES.filter(s=>!S.level||s.lv===S.level);
+  stage.innerHTML=`<div class="stories">${list.map(s=>`<button class="story" data-id="${s.id}"><span class="tag">HSK ${s.lv}</span><b class="zh">${s.t}</b><span>${esc(s.es)}</span><span class="meta">${s.s.length} frases${S.read[s.id]?" · <em>Leída</em>":""}</span></button>`).join("")}</div>`;
+  stage.querySelectorAll(".story").forEach(b=>b.onclick=()=>{S.story=b.dataset.id;save();render();window.scrollTo(0,0)});
+}
+function reader(){
+  const st=STORIES.find(x=>x.id===S.story);if(!st){S.story=null;return readList()}
+  const sent=st.s.map(([zh,es])=>{const T=zh.split(" ").map(tok);
+    const line=T.map(x=>x.pu?`<span>${x.pu}</span>`:`<ruby class="w${S.fails[x.h]?" saved":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}">${x.h}<rt>${esc(x.p)}</rt></ruby>`).join("");
+    const say=T.map(x=>x.pu||x.h).join("");
+    return `<div class="sent"><div class="zhline">${line}</div><button class="x" data-say="${say}" aria-label="Escuchar la frase">${icon}</button><div class="tr">${esc(es)}</div></div>`}).join("");
+  stage.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+    <div class="top"><button class="link" id="back2">← Lecturas</button><span class="tag">HSK ${st.lv}</span></div>
+    <div><div class="han" style="font-size:30px;text-align:left;font-weight:700">${st.t}</div><div class="hint" style="text-align:left">${esc(st.es)}</div></div>
+    <div class="chips"><button class="chip" id="tPy" aria-pressed="${S.py}">Pinyin</button><button class="chip" id="tTr" aria-pressed="${S.tr}">Traducción</button></div>
+    <div class="hint" style="text-align:left">Toca o mantén pulsada una palabra para ver qué significa y guardarla.</div>
+    <div class="text ${S.py?"":"nopy"} ${S.tr?"":"notr"}" id="txt">${sent}</div>
+    <button class="btn ${S.read[st.id]?"":"yes"} wide" id="done">${S.read[st.id]?"Leída ✓":"Marcar como leída"}</button></div>`;
+  $("back2").onclick=()=>{S.story=null;save();render()};
+  $("tPy").onclick=()=>{S.py=!S.py;save();$("tPy").setAttribute("aria-pressed",S.py);$("txt").classList.toggle("nopy",!S.py)};
+  $("tTr").onclick=()=>{S.tr=!S.tr;save();$("tTr").setAttribute("aria-pressed",S.tr);$("txt").classList.toggle("notr",!S.tr)};
+  $("done").onclick=()=>{S.read[st.id]=!S.read[st.id];save();reader()};
+  const open=e=>{const w=e.target.closest("ruby.w");if(!w)return;e.preventDefault();openSheet(w)};
+  $("txt").addEventListener("click",open);$("txt").addEventListener("contextmenu",open);
+}
+let shEl=null;
+function openSheet(el){
+  document.querySelectorAll("ruby.w.sel").forEach(x=>x.classList.remove("sel"));el.classList.add("sel");shEl=el;
+  const h=el.dataset.h,d=BY[h];
+  $("shTag").textContent=d&&d.lv?`HSK ${d.lv}`:"Fuera de HSK 1-2";
+  $("shHan").textContent=h;$("shPy").textContent=el.dataset.p;$("shMean").textContent=el.dataset.m;
+  syncSave();$("sheet").hidden=false;$("sheetBg").hidden=false;speak(h);
+}
+function syncSave(){const h=shEl.dataset.h,b=$("shSave");const on=!!S.fails[h];b.textContent=on?"Guardada ✓ (quitar)":"Guardar para estudiar";b.className="btn "+(on?"":"yes")}
+function closeSheet(){$("sheet").hidden=true;$("sheetBg").hidden=true;if(shEl)shEl.classList.remove("sel")}
+$("sheetBg").onclick=closeSheet;$("sheetClose").onclick=closeSheet;
+$("shSay").onclick=()=>speak(shEl.dataset.h);
+$("shSave").onclick=()=>{const h=shEl.dataset.h;if(S.fails[h])delete S.fails[h];else S.fails[h]=1;save();updateBadge();syncSave();
+  document.querySelectorAll(`ruby.w[data-h="${h}"]`).forEach(x=>x.classList.toggle("saved",!!S.fails[h]))};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
 
 /* ---------- General ---------- */
 function updateBadge(){const n=Object.keys(S.fails).length;const b=$("failBadge");b.hidden=!n;b.textContent=n}
 function stats(){
   const p=pool(),k=p.filter(w=>boxOf(w)>=3).length;
   $("known").textContent=k;$("total").textContent=p.length;$("barfill").style.width=(p.length?k/p.length*100:0)+"%";
-  $("stats").innerHTML=S.mode==="fails"?"":`<span>Aciertos <b>${sess.ok}</b></span><span>Fallos <b>${sess.bad}</b></span><span>Racha <b>${sess.streak}</b></span>`;
+  $("stats").innerHTML=S.mode==="fails"||S.mode==="read"?"":`<span>Aciertos <b>${sess.ok}</b></span><span>Fallos <b>${sess.bad}</b></span><span>Racha <b>${sess.streak}</b></span>`;
 }
 function render(){
   document.querySelectorAll("#modeSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===S.mode));
   document.querySelectorAll("#levelSeg button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.lv===S.level));
-  $("levelSeg").hidden=S.mode==="fails"||(S.mode==="quiz"&&!!S.run);
+  $("levelSeg").hidden=S.mode==="fails"||(S.mode==="quiz"&&!!S.run)||(S.mode==="cards"&&S.cardFails)||(S.mode==="read"&&!!S.story);
   updateBadge();
-  if(S.mode==="cards")cards();else if(S.mode==="quiz")quiz();else failsView();
+  if(S.mode==="cards")cards();else if(S.mode==="quiz")quiz();else if(S.mode==="read")(S.story?reader():readList());else failsView();
   stats();
 }
-document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{S.mode=b.dataset.mode;save();render()});
+document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{if(S.mode===b.dataset.mode&&S.mode==="read")S.story=null;if(b.dataset.mode==="cards"&&S.mode!=="cards"){S.cardFails=false;cur=null}S.mode=b.dataset.mode;save();render();window.scrollTo(0,0)});
 document.querySelectorAll("#levelSeg button").forEach(b=>b.onclick=()=>{S.level=+b.dataset.lv;save();cur=null;render()});
 $("reset").onclick=()=>{$("confirmWrap").hidden=false};
-$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;render()};
+$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;S.read={};S.cardFails=false;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;render()};
 render();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
