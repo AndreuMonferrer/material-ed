@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hanzi HSK 1·2</title>
+<meta name="theme-color" content="#2B7A5F">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hanzi">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+/* Layout: una sola columna tipo app, tarjeta central grande con el carácter como protagonista */
+:root{
+  --bg:#EDF1EE; --surface:#FBFCFA; --ink:#17201C; --muted:#5D6B64; --line:#D3DCD6;
+  --jade:#2B7A5F; --jade-soft:#D6E9E0; --seal:#B5372B; --seal-soft:#F3DCD8;
+  --han:"Noto Serif SC","Songti SC","STSong",serif;
+  --ui:"Manrope",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111715; --surface:#1A221F; --ink:#E6ECE8; --muted:#93A39B; --line:#2C3833;
+  --jade:#5FBF98; --jade-soft:#1F3A2F; --seal:#E8786B; --seal-soft:#3E2220; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111715; --surface:#1A221F; --ink:#E6ECE8; --muted:#93A39B; --line:#2C3833;
+  --jade:#5FBF98; --jade-soft:#1F3A2F; --seal:#E8786B; --seal-soft:#3E2220; color-scheme:dark}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px}
+.app{max-width:520px;margin:0 auto;padding-block:14px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-family:var(--han);font-weight:700;font-size:26px;letter-spacing:.04em}
+h1 small{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.08em;margin-left:6px;text-transform:uppercase}
+.prog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog b{color:var(--jade)}
+.bar{height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--jade);width:0;transition:width .3s}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:600 14px var(--ui);padding:9px 6px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--jade);color:var(--surface)}
+.seg.small button{font-size:12.5px;padding:7px 4px}
+button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;min-height:300px;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lvl{position:absolute;top:12px;left:14px;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.speak{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--jade);display:grid;place-items:center;cursor:pointer}
+.han{font-family:var(--han);font-size:clamp(64px,22vw,112px);line-height:1.1;font-weight:500;text-align:center;word-break:keep-all}
+.han.long{font-size:clamp(48px,15vw,84px)}
+.py{font-size:22px;font-weight:600;color:var(--jade);letter-spacing:.02em}
+.mean{font-size:18px;text-align:center;max-width:30ch}
+.hint{font-size:13px;color:var(--muted)}
+.prompt{font-size:22px;font-weight:600;text-align:center;max-width:24ch;text-wrap:balance}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 15px var(--ui);padding:14px 10px;border-radius:14px;cursor:pointer;min-height:52px}
+.btn.no{color:var(--seal);border-color:var(--seal-soft)}
+.btn.yes{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.opt{font-size:16px;text-align:center;line-height:1.3}
+.opt.hz{font-family:var(--han);font-size:28px;font-weight:500}
+.opt.ok{background:var(--jade-soft);border-color:var(--jade);color:var(--ink)}
+.opt.bad{background:var(--seal-soft);border-color:var(--seal);color:var(--ink)}
+.opt:disabled{cursor:default}
+.stats{display:flex;justify-content:center;gap:18px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+.foot{margin-top:auto;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font:inherit;cursor:pointer;padding:4px}
+.dots{display:flex;gap:4px}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots span.on{background:var(--jade)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>汉字<small>HSK 1 · 2</small></h1>
+    <div class="prog"><b id="known">0</b> / <span id="total">0</span> dominadas</div>
+  </header>
+  <div class="bar"><i id="barfill"></i></div>
+
+  <div class="seg" id="levelSeg" role="group" aria-label="Nivel">
+    <button id="lv1" data-lv="1" aria-pressed="false">HSK 1</button>
+    <button id="lv2" data-lv="2" aria-pressed="false">HSK 2</button>
+    <button id="lv0" data-lv="0" aria-pressed="true">Los dos</button>
+  </div>
+  <div class="seg" id="modeSeg" role="group" aria-label="Modo">
+    <button id="mCards" data-mode="cards" aria-pressed="true">Tarjetas</button>
+    <button id="mQuiz" data-mode="quiz" aria-pressed="false">Test</button>
+  </div>
+  <div class="seg small" id="dirSeg" role="group" aria-label="Tipo de pregunta" hidden>
+    <button id="d1" data-dir="hm" aria-pressed="true">汉字 → significado</button>
+    <button id="d2" data-dir="mh" aria-pressed="false">significado → 汉字</button>
+    <button id="d3" data-dir="hp" aria-pressed="false">汉字 → pinyin</button>
+  </div>
+
+  <main id="stage"></main>
+
+  <div class="stats" id="stats"></div>
+  <p class="foot">Las palabras que fallas salen más a menudo. Tu progreso se guarda en este dispositivo.<br><button class="link" id="reset">Borrar progreso</button><span id="confirmWrap" hidden> ¿Seguro? <button class="link" id="resetYes">Sí, borrar</button></span></p>
+</div>
+
+<script>
+const RAW1=`爱|ài|amar
+八|bā|ocho
+爸爸|bàba|papá
+杯子|bēizi|vaso, taza
+北京|Běijīng|Pekín
+本|běn|clasificador de libros
+不|bù|no
+不客气|bú kèqi|de nada
+菜|cài|plato, verdura
+茶|chá|té
+吃|chī|comer
+出租车|chūzūchē|taxi
+打电话|dǎ diànhuà|llamar por teléfono
+大|dà|grande
+的|de|partícula posesiva
+点|diǎn|en punto (hora)
+电脑|diànnǎo|ordenador
+电视|diànshì|televisión
+电影|diànyǐng|película
+东西|dōngxi|cosa
+都|dōu|todos, ambos
+读|dú|leer en voz alta
+对不起|duìbuqǐ|perdón, lo siento
+多|duō|mucho
+多少|duōshao|cuánto
+儿子|érzi|hijo
+二|èr|dos
+饭店|fàndiàn|restaurante, hotel
+飞机|fēijī|avión
+分钟|fēnzhōng|minuto
+高兴|gāoxìng|contento
+个|gè|clasificador general
+工作|gōngzuò|trabajo, trabajar
+狗|gǒu|perro
+汉语|Hànyǔ|chino (idioma)
+好|hǎo|bueno, bien
+号|hào|número, día del mes
+喝|hē|beber
+和|hé|y, con
+很|hěn|muy
+后面|hòumian|detrás
+回|huí|volver
+会|huì|saber hacer, poder
+几|jǐ|cuántos (pocos)
+家|jiā|casa, familia
+叫|jiào|llamarse
+今天|jīntiān|hoy
+九|jiǔ|nueve
+开|kāi|abrir, conducir
+看|kàn|mirar
+看见|kànjiàn|ver
+块|kuài|yuan (moneda)
+来|lái|venir
+老师|lǎoshī|profesor
+了|le|partícula de acción completada
+冷|lěng|frío
+里|lǐ|dentro
+六|liù|seis
+妈妈|māma|mamá
+吗|ma|partícula interrogativa
+买|mǎi|comprar
+猫|māo|gato
+没关系|méi guānxi|no pasa nada
+没有|méiyǒu|no tener, no haber
+米饭|mǐfàn|arroz cocido
+名字|míngzi|nombre
+明天|míngtiān|mañana (día)
+哪|nǎ|cuál
+哪儿|nǎr|dónde
+那|nà|eso, aquel
+呢|ne|partícula (¿y…?)
+能|néng|poder
+你|nǐ|tú
+年|nián|año
+女儿|nǚ'ér|hija
+朋友|péngyou|amigo
+漂亮|piàoliang|bonito, guapo
+苹果|píngguǒ|manzana
+七|qī|siete
+前面|qiánmian|delante
+钱|qián|dinero
+请|qǐng|por favor, invitar
+去|qù|ir
+热|rè|calor, caliente
+人|rén|persona
+认识|rènshi|conocer (a alguien)
+三|sān|tres
+商店|shāngdiàn|tienda
+上|shàng|arriba, encima
+上午|shàngwǔ|por la mañana
+少|shǎo|poco
+谁|shéi|quién
+什么|shénme|qué
+十|shí|diez
+时候|shíhou|momento, cuando
+是|shì|ser
+书|shū|libro
+水|shuǐ|agua
+水果|shuǐguǒ|fruta
+睡觉|shuìjiào|dormir
+说|shuō|hablar, decir
+四|sì|cuatro
+岁|suì|años (de edad)
+他|tā|él
+她|tā|ella
+太|tài|demasiado
+天气|tiānqì|tiempo (clima)
+听|tīng|escuchar
+同学|tóngxué|compañero de clase
+喂|wèi|¿diga? (teléfono)
+我|wǒ|yo
+我们|wǒmen|nosotros
+五|wǔ|cinco
+喜欢|xǐhuan|gustar
+下|xià|abajo, debajo
+下午|xiàwǔ|por la tarde
+下雨|xià yǔ|llover
+先生|xiānsheng|señor
+现在|xiànzài|ahora
+想|xiǎng|querer, pensar
+小|xiǎo|pequeño
+小姐|xiǎojiě|señorita
+些|xiē|algunos
+写|xiě|escribir
+谢谢|xièxie|gracias
+星期|xīngqī|semana
+学生|xuésheng|estudiante
+学习|xuéxí|estudiar
+学校|xuéxiào|escuela
+一|yī|uno
+一点儿|yìdiǎnr|un poco
+衣服|yīfu|ropa
+医生|yīshēng|médico
+医院|yīyuàn|hospital
+椅子|yǐzi|silla
+有|yǒu|tener, haber
+月|yuè|mes, luna
+在|zài|estar en
+再见|zàijiàn|adiós
+怎么|zěnme|cómo
+怎么样|zěnmeyàng|¿qué tal?
+这|zhè|esto, este
+中国|Zhōngguó|China
+中午|zhōngwǔ|mediodía
+住|zhù|vivir, alojarse
+桌子|zhuōzi|mesa
+字|zì|carácter
+昨天|zuótiān|ayer
+坐|zuò|sentarse, ir en (transporte)
+做|zuò|hacer`;
+const RAW2=`吧|ba|partícula de sugerencia
+白|bái|blanco
+百|bǎi|cien
+帮助|bāngzhù|ayudar
+报纸|bàozhǐ|periódico
+比|bǐ|que (comparación)
+别|bié|no (imperativo)
+宾馆|bīnguǎn|hotel
+长|cháng|largo
+唱歌|chàng gē|cantar
+出|chū|salir
+穿|chuān|ponerse, vestir
+次|cì|vez
+从|cóng|desde
+错|cuò|incorrecto, error
+打篮球|dǎ lánqiú|jugar al baloncesto
+大家|dàjiā|todo el mundo
+但是|dànshì|pero
+到|dào|llegar, hasta
+得|de|partícula de grado
+等|děng|esperar
+弟弟|dìdi|hermano menor
+第一|dì yī|primero
+懂|dǒng|entender
+对|duì|correcto, hacia
+房间|fángjiān|habitación
+非常|fēicháng|muchísimo
+服务员|fúwùyuán|camarero
+高|gāo|alto
+告诉|gàosu|decir, informar
+哥哥|gēge|hermano mayor
+给|gěi|dar, para
+公共汽车|gōnggòng qìchē|autobús
+公司|gōngsī|empresa
+贵|guì|caro
+过|guo|partícula de experiencia
+还|hái|todavía, además
+孩子|háizi|niño
+好吃|hǎochī|rico (comida)
+黑|hēi|negro
+红|hóng|rojo
+火车站|huǒchēzhàn|estación de tren
+机场|jīchǎng|aeropuerto
+鸡蛋|jīdàn|huevo
+件|jiàn|clasificador de ropa y asuntos
+教室|jiàoshì|aula
+姐姐|jiějie|hermana mayor
+介绍|jièshào|presentar
+进|jìn|entrar
+近|jìn|cerca
+就|jiù|justo, enseguida
+觉得|juéde|pensar, sentir
+咖啡|kāfēi|café
+开始|kāishǐ|empezar
+考试|kǎoshì|examen
+可能|kěnéng|posible, quizá
+可以|kěyǐ|poder (permiso)
+课|kè|clase, lección
+快|kuài|rápido
+快乐|kuàilè|feliz
+累|lèi|cansado
+离|lí|distar de
+两|liǎng|dos (cantidad)
+路|lù|camino, calle
+旅游|lǚyóu|viajar (turismo)
+卖|mài|vender
+慢|màn|lento
+忙|máng|ocupado
+每|měi|cada
+妹妹|mèimei|hermana menor
+门|mén|puerta
+面条|miàntiáo|fideos
+男|nán|hombre, masculino
+您|nín|usted
+牛奶|niúnǎi|leche
+女|nǚ|mujer, femenino
+旁边|pángbiān|al lado
+跑步|pǎobù|correr
+便宜|piányi|barato
+票|piào|billete, entrada
+妻子|qīzi|esposa
+起床|qǐchuáng|levantarse
+千|qiān|mil
+铅笔|qiānbǐ|lápiz
+晴|qíng|despejado
+去年|qùnián|el año pasado
+让|ràng|dejar, hacer que
+日|rì|día, sol
+上班|shàngbān|ir a trabajar
+身体|shēntǐ|cuerpo, salud
+生病|shēngbìng|ponerse enfermo
+生日|shēngrì|cumpleaños
+时间|shíjiān|tiempo
+事情|shìqing|asunto, cosa
+手表|shǒubiǎo|reloj de pulsera
+手机|shǒujī|teléfono móvil
+说话|shuōhuà|hablar
+送|sòng|regalar, acompañar
+所以|suǒyǐ|por eso
+虽然|suīrán|aunque
+它|tā|ello (cosas, animales)
+踢足球|tī zúqiú|jugar al fútbol
+题|tí|pregunta de ejercicio
+跳舞|tiàowǔ|bailar
+外|wài|fuera
+完|wán|terminar
+玩|wán|jugar, divertirse
+晚上|wǎnshang|noche
+往|wǎng|hacia
+为什么|wèi shénme|por qué
+问|wèn|preguntar
+问题|wèntí|pregunta, problema
+西瓜|xīguā|sandía
+希望|xīwàng|esperar, desear
+洗|xǐ|lavar
+向|xiàng|hacia
+小时|xiǎoshí|hora (duración)
+笑|xiào|reír, sonreír
+新|xīn|nuevo
+姓|xìng|apellidarse
+休息|xiūxi|descansar
+雪|xuě|nieve
+颜色|yánsè|color
+眼睛|yǎnjing|ojo
+羊肉|yángròu|cordero
+药|yào|medicina
+要|yào|querer, necesitar
+也|yě|también
+一起|yìqǐ|juntos
+一下|yíxià|un momento, un poco
+已经|yǐjīng|ya
+意思|yìsi|significado
+因为|yīnwèi|porque
+阴|yīn|nublado
+游泳|yóuyǒng|nadar
+右边|yòubian|derecha
+鱼|yú|pez, pescado
+远|yuǎn|lejos
+运动|yùndòng|deporte
+再|zài|otra vez
+早上|zǎoshang|por la mañana temprano
+丈夫|zhàngfu|marido
+找|zhǎo|buscar
+着|zhe|partícula de continuidad
+真|zhēn|realmente
+正在|zhèngzài|estar haciendo
+知道|zhīdào|saber
+准备|zhǔnbèi|preparar
+走|zǒu|caminar, irse
+最|zuì|el más
+左边|zuǒbian|izquierda`;
+
+const parse=(raw,lv)=>raw.trim().split("\n").map(l=>{const [h,p,m]=l.split("|");return {h,p,m,lv}});
+const ALL=[...parse(RAW1,1),...parse(RAW2,2)];
+
+// Fuente china con solo los caracteres usados (descarga pequeña)
+(()=>{const chars=[...new Set(ALL.map(w=>w.h).join("")+"汉字练习")].join("");
+const l=document.createElement("link");l.rel="stylesheet";
+l.href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap";document.head.appendChild(l);
+const l2=document.createElement("link");l2.rel="stylesheet";
+l2.href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&display=swap&text="+encodeURIComponent(chars);document.head.appendChild(l2);})();
+
+const KEY="hanzi-hsk12-v1";
+let S={box:{},level:0,mode:"cards",dir:"hm"};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let sess={ok:0,bad:0,streak:0};
+let cur=null,revealed=false,lastH=null;
+
+const pool=()=>ALL.filter(w=>!S.level||w.lv===S.level);
+const boxOf=w=>S.box[w.h]||0;
+function pick(){
+  const p=pool();let tot=0;const ws=p.map(w=>{const b=boxOf(w);const wt=w.h===lastH?0:[8,4,2,1,.4][b];tot+=wt;return wt});
+  let r=Math.random()*tot;for(let i=0;i<p.length;i++){r-=ws[i];if(r<=0)return p[i]}return p[0];
+}
+function grade(w,good){const b=boxOf(w);S.box[w.h]=good?Math.min(4,b+1):0;save();
+  if(good){sess.ok++;sess.streak++}else{sess.bad++;sess.streak=0}}
+
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+const icon='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+const dots=w=>'<div class="dots" aria-label="Nivel de dominio">'+[1,2,3,4].map(i=>`<span class="${boxOf(w)>=i?"on":""}"></span>`).join("")+'</div>';
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const stage=document.getElementById("stage");
+
+function renderCard(){
+  cur=pick();lastH=cur.h;revealed=false;draw();
+}
+function draw(){
+  const w=cur;
+  if(S.mode==="cards"){
+    stage.innerHTML=`<div class="card" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
+      <span class="lvl">HSK ${w.lv}</span>
+      <button class="speak" id="spk" aria-label="Escuchar pronunciación">${icon}</button>
+      <div class="han ${w.h.length>2?"long":""}">${w.h}</div>
+      ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn no" id="again" ${revealed?"":"disabled"}>Otra vez</button>
+      <button class="btn yes" id="know" ${revealed?"":"disabled"}>La sé</button>
+    </div>`;
+    const cb=document.getElementById("cardBox");
+    const rev=()=>{if(!revealed){revealed=true;draw();speak(w.h)}};
+    cb.onclick=e=>{if(e.target.closest("#spk"))return;rev()};
+    cb.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();rev()}};
+    document.getElementById("spk").onclick=e=>{e.stopPropagation();speak(w.h)};
+    document.getElementById("again").onclick=()=>{grade(w,false);next()};
+    document.getElementById("know").onclick=()=>{grade(w,true);next()};
+  } else {
+    const p=pool();const field=S.dir==="hp"?"p":S.dir==="mh"?"h":"m";
+    const opts=[w];const seen=new Set([w[field]]);
+    let guard=0;while(opts.length<4&&guard++<200){const o=p[Math.floor(Math.random()*p.length)];if(!seen.has(o[field])){seen.add(o[field]);opts.push(o)}}
+    opts.sort(()=>Math.random()-.5);
+    const q=S.dir==="mh"?`<div class="prompt">${esc(w.m)}</div><div class="hint">Elige el carácter</div>`
+      :`<div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="hint">${S.dir==="hp"?"¿Cómo se pronuncia?":"¿Qué significa?"}</div>`;
+    stage.innerHTML=`<div class="card" style="cursor:default;min-height:240px">
+      <span class="lvl">HSK ${w.lv}</span>
+      <button class="speak" id="spk" aria-label="Escuchar pronunciación">${icon}</button>${q}
+      <div id="after"></div></div>
+      <div class="row" style="margin-top:12px" id="opts">${opts.map((o,i)=>`<button class="btn opt ${field==="h"?"hz":""}" id="o${i}" data-i="${i}">${esc(o[field])}</button>`).join("")}</div>
+      <div class="row" style="margin-top:10px;grid-template-columns:1fr" id="nextRow" hidden><button class="btn yes" id="nextBtn">Siguiente</button></div>`;
+    document.getElementById("spk").onclick=()=>speak(w.h);
+    document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+      const o=opts[+b.dataset.i];const good=o===w;grade(w,good);
+      document.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(opts[+x.dataset.i]===w)x.classList.add("ok")});
+      if(!good)b.classList.add("bad");
+      document.getElementById("after").innerHTML=`<div class="py">${esc(w.p)}</div><div class="mean">${S.dir==="mh"?"":esc(w.m)}</div>`;
+      speak(w.h);stats();
+      document.getElementById("nextRow").hidden=false;document.getElementById("nextBtn").focus();
+      document.getElementById("nextBtn").onclick=next;
+    });
+  }
+  stats();
+}
+function next(){renderCard()}
+function stats(){
+  const p=pool();const k=p.filter(w=>boxOf(w)>=3).length;
+  document.getElementById("known").textContent=k;document.getElementById("total").textContent=p.length;
+  document.getElementById("barfill").style.width=(p.length?k/p.length*100:0)+"%";
+  document.getElementById("stats").innerHTML=`<span>Aciertos <b>${sess.ok}</b></span><span>Fallos <b>${sess.bad}</b></span><span>Racha <b>${sess.streak}</b></span>`;
+}
+function syncSeg(){
+  document.querySelectorAll("#levelSeg button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.lv===S.level));
+  document.querySelectorAll("#modeSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===S.mode));
+  document.querySelectorAll("#dirSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dir===S.dir));
+  document.getElementById("dirSeg").hidden=S.mode!=="quiz";
+}
+document.querySelectorAll("#levelSeg button").forEach(b=>b.onclick=()=>{S.level=+b.dataset.lv;save();syncSeg();renderCard()});
+document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{S.mode=b.dataset.mode;save();syncSeg();revealed=false;draw()});
+document.querySelectorAll("#dirSeg button").forEach(b=>b.onclick=()=>{S.dir=b.dataset.dir;save();syncSeg();draw()});
+document.getElementById("reset").onclick=()=>{document.getElementById("confirmWrap").hidden=false};
+document.getElementById("resetYes").onclick=()=>{S.box={};sess={ok:0,bad:0,streak:0};save();document.getElementById("confirmWrap").hidden=true;renderCard()};
+syncSeg();renderCard();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+
+</body>
+</html>
