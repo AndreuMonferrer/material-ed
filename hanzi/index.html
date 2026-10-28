@@ -145,6 +145,28 @@ textarea{width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid 
 #stTarget{position:relative;width:100%;height:100%}
 #stBg{z-index:30!important}
 #stSheet{z-index:31!important}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px}
+.back{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--ui);padding:8px 14px;border-radius:999px;cursor:pointer}
+#secTitle{font-weight:700;font-size:17px}
+.home{display:flex;flex-direction:column;gap:14px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:2px;font:inherit;cursor:pointer;min-height:118px}
+.tile .ic{font-family:var(--han);font-size:30px;line-height:1.1;color:var(--jade);margin-bottom:6px}
+.tile b{font-size:16px}
+.tile span{font-size:12.5px;color:var(--muted);line-height:1.35}
+.tile .badge{position:absolute;top:12px;right:12px;margin:0;color:var(--surface);font-size:11px;line-height:18px}
+.resume{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:12px 16px}
+.resume div{display:flex;flex-direction:column;min-width:0}
+.resume span{font-size:13px;color:var(--muted)}
+.modechips{display:flex;gap:6px;flex-wrap:wrap}
+.topics{display:flex;flex-direction:column;gap:8px}
+.topic{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.topic .ic{font-family:var(--han);font-size:26px;color:var(--jade);width:1.4em;text-align:center}
+.topic .t{min-width:0;display:flex;flex-direction:column}
+.topic .t b{font-size:15px}
+.topic .t span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--han)}
+.topic .acts{display:flex;gap:6px;grid-column:2}
+.topic .acts .chip{padding:7px 11px}
 .dots{display:flex;gap:4px}
 .dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
 .dots span.on{background:var(--jade)}
@@ -159,22 +181,12 @@ textarea{width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid 
   </header>
   <div class="bar"><i id="barfill"></i></div>
 
-  <div class="seg" id="modeSeg" role="group" aria-label="Sección">
-    <button id="mCards" data-mode="cards">Tarjetas</button>
-    <button id="mQuiz" data-mode="quiz">Test</button>
-    <button id="mRead" data-mode="read">Lecturas</button>
-    <button id="mFails" data-mode="fails">Fallos<span class="badge" id="failBadge" hidden>0</span></button>
-  </div>
-  <div class="seg" id="levelSeg" role="group" aria-label="Nivel">
-    <button id="lv1" data-lv="1">HSK 1</button>
-    <button id="lv2" data-lv="2">HSK 2</button>
-    <button id="lv0" data-lv="0">Los dos</button>
-  </div>
+  <div class="nav" id="nav" hidden><button class="back" id="homeBtn">← Inicio</button><span id="secTitle"></span></div>
 
   <main id="stage"></main>
   <div class="stats" id="stats"></div>
-  <p class="foot" id="foot">Tu progreso se guarda en este móvil.<br><button class="link" id="bkBtn">Copia de seguridad</button> · <button class="link" id="reset">Borrar todo el progreso</button><span id="confirmWrap" hidden> ¿Seguro? <button class="link" id="resetYes">Sí, borrar</button></span></p>
-  <div class="panel" id="bk" hidden>
+  <section id="moreSec" hidden style="display:flex;flex-direction:column;gap:12px">
+  <div class="panel" id="bk">
     <h2>Exportar mi progreso</h2>
     <p class="hint" style="text-align:left">Copia este código y guárdalo en una nota o envíatelo por correo. Te sirve para recuperar el progreso o pasarlo a otro móvil.</p>
     <textarea id="bkOut" readonly rows="3"></textarea>
@@ -185,6 +197,14 @@ textarea{width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid 
     <button class="btn yes" id="bkLoad">Recuperar progreso</button>
     <div class="hint" id="bkMsg" style="text-align:left"></div>
   </div>
+  <div class="panel">
+    <h2>Borrar progreso</h2>
+    <p class="hint" style="text-align:left">Borra tus aciertos, fallos, repasos y lecturas de este móvil. Haz antes una copia si quieres conservarlos.</p>
+    <button class="btn no" id="reset">Borrar todo el progreso</button>
+    <div id="confirmWrap" hidden class="hint" style="text-align:left">¿Seguro? No se puede deshacer. <button class="link" id="resetYes" style="color:var(--seal)">Sí, borrar todo</button></div>
+  </div>
+  </section>
+  <p class="foot">Tu progreso se guarda en este móvil.</p>
 </div>
 <div id="stBg" hidden></div>
 <div id="stSheet" hidden role="dialog" aria-label="Orden de trazos">
@@ -1018,6 +1038,27 @@ const SENT_RAW=`爱|我{爱}我的妈妈。|Quiero a mi madre.
 左边|我家在学校{左边}。|Mi casa está a la izquierda de la escuela.`;
 const SENT={};SENT_RAW.trim().split("\n").forEach(l=>{const[h,s,es]=l.split("|");SENT[h]={s,es}});
 
+const TOPICS=[
+["num","数","Números y medidas","八 本 二 个 九 六 七 三 十 四 五 一 一点儿 些 多 少 岁 百 次 第一 件 两 千"],
+["time","时","Tiempo y fechas","点 分钟 号 今天 明天 年 上午 时候 下午 现在 星期 月 中午 昨天 去年 日 生日 时间 晚上 小时 早上"],
+["fam","人","Familia y personas","爸爸 儿子 家 妈妈 名字 女儿 朋友 人 先生 小姐 弟弟 哥哥 孩子 姐姐 妹妹 男 女 妻子 丈夫 姓"],
+["food","吃","Comida y bebida","菜 茶 吃 喝 米饭 苹果 水 水果 好吃 鸡蛋 咖啡 面条 牛奶 西瓜 羊肉 鱼"],
+["shop","钱","Compras y dinero","买 块 钱 商店 多少 贵 卖 便宜"],
+["trans","车","Transporte y lugares","北京 中国 出租车 飞机 公共汽车 火车站 机场 路 票 饭店 宾馆"],
+["home","家","Casa, ropa y objetos","杯子 电脑 电视 东西 衣服 椅子 桌子 报纸 穿 房间 门 事情 手表 手机"],
+["school","学","Estudios y trabajo","读 写 字 书 汉语 老师 同学 学生 学习 学校 工作 服务员 公司 教室 考试 课 铅笔 上班 题 问题 意思"],
+["weather","天","Clima y animales","天气 冷 热 下雨 晴 雪 阴 狗 猫"],
+["desc","色","Descripciones y colores","大 小 好 高兴 漂亮 长 错 对 高 快 快乐 累 慢 忙 新 颜色 白 黑 红"],
+["pos","上","Posición y dirección","上 下 里 在 前面 后面 旁边 外 右边 左边 从 往 向 离 近 远"],
+["health","医","Cuerpo y salud","医生 医院 身体 生病 眼睛 药"],
+["leisure","玩","Ocio y deporte","电影 唱歌 打篮球 旅游 跑步 踢足球 跳舞 玩 游泳 运动"],
+["verb","做","Verbos de acción","爱 是 有 没有 叫 认识 喜欢 想 会 能 可以 要 来 去 回 到 进 出 走 坐 住 看 看见 听 说 说话 打电话 睡觉 起床 做 开 等 懂 告诉 给 送 介绍 觉得 开始 让 完 问 希望 洗 笑 休息 找 知道 准备 帮助"],
+["q","你","Pronombres y preguntas","我 我们 你 您 他 她 它 大家 这 那 谁 什么 哪 哪儿 几 怎么 怎么样 为什么"],
+["expr","好","Saludos y expresiones","谢谢 不客气 对不起 没关系 请 喂 再见"],
+["gram","的","Gramática y partículas","的 了 吗 呢 吧 着 过 得 不 别 很 太 非常 最 真 都 也 还 就 再 和 比 但是 所以 虽然 因为 可能 每 一起 一下 已经 正在"]
+].map(([k,ic,label,ws])=>({k,ic,label,words:ws.split(" ").filter(h=>BY[h]&&BY[h].lv)}));
+const TOPIC=Object.fromEntries(TOPICS.map(t=>[t.k,t]));
+
 const BLOCK=25;
 function blocksOf(list){const n=Math.ceil(list.length/BLOCK),size=Math.ceil(list.length/n),out=[];for(let i=0;i<n;i++)out.push(list.slice(i*size,(i+1)*size));return out}
 const BLOCKS={1:blocksOf(L1),2:blocksOf(L2)};
@@ -1027,7 +1068,7 @@ const BLOCKS={1:blocksOf(L1),2:blocksOf(L2)};
 const l=document.createElement("link");l.rel="stylesheet";l.href=href;document.head.appendChild(l)}})();
 
 const KEY="hanzi-hsk12-v1";
-let S={box:{},level:1,mode:"quiz",dir:"ht",fails:{},fok:{},srs:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardFails:false};
+let S={box:{},level:1,mode:"home",dir:"ht",fails:{},fok:{},srs:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardSet:null};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
 if(!S.fails)S.fails={};if(!S.fok)S.fok={};if(!S.srs)S.srs={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
@@ -1035,7 +1076,10 @@ let sess={ok:0,bad:0,streak:0},cur=null,revealed=false,lastH=null,answered=false
 
 const boxOf=w=>S.box[w.h]||0;
 const failWords=()=>Object.keys(S.fails).map(h=>BY[h]).filter(Boolean);
-const pool=()=>{if(S.mode==="cards"&&S.cardFails){const f=failWords();if(f.length)return f}return ALL.filter(w=>!S.level||w.lv===S.level)};
+const setWords=k=>k==="fails"?failWords():k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].words.map(h=>BY[h]).filter(w=>!S.level||w.lv===S.level):[];
+const setLabel=k=>k==="fails"?"Mis fallos":k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].label:"";
+const levelWords=()=>ALL.filter(w=>!S.level||w.lv===S.level);
+const pool=()=>{if(S.mode==="cards"&&S.cardSet){const f=setWords(S.cardSet);if(f.length)return f}return levelWords()};
 const lvTag=w=>w.lv?`HSK ${w.lv}`:"Lectura";
 const DAY=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
 const NEW_PER_DAY=10,FAIL_OK=2;
@@ -1068,7 +1112,7 @@ function pickCard(){const p=pool();let tot=0;const ws=p.map(w=>{const wt=w.h===l
 function cards(newCard){
   if(newCard||!cur){cur=pickCard();lastH=cur.h;revealed=false}
   const w=cur;
-  stage.innerHTML=(S.cardFails?`<div class="top" style="margin-bottom:10px"><span class="hint" style="text-align:left"><b>Tarjetas · mis fallos</b> (${failWords().length})</span><button class="link" id="cfExit">Salir</button></div>`:"")+`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
+  stage.innerHTML=`<div class="top" style="margin-bottom:10px"><span class="hint" style="text-align:left"><b>${S.cardSet?esc(setLabel(S.cardSet)):"Todas las palabras"}</b> · ${levelName()} · ${pool().length} palabras</span>${S.cardSet?`<button class="link" id="cfExit">Ver todas</button>`:""}</div>`+`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
     <span class="lvl">${lvTag(w)}</span>${spk()}
     <div class="han ${w.h.length>2?"long":""}">${w.h}</div>
     ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}${strokeBtn(w.h)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
@@ -1077,7 +1121,7 @@ function cards(newCard){
     <button class="btn no" id="again" ${revealed?"":"disabled"}>Otra vez</button>
     <button class="btn yes" id="know" ${revealed?"":"disabled"}>La sé</button>
   </div>`;
-  if(S.cardFails)$("cfExit").onclick=()=>{S.cardFails=false;save();cur=null;render()};
+  if(S.cardSet)$("cfExit").onclick=()=>{S.cardSet=null;save();cur=null;render()};
   const rev=()=>{if(!revealed){revealed=true;cards();speak(w.h)}};
   $("cardBox").onclick=rev;
   $("cardBox").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();rev()}};
@@ -1117,19 +1161,18 @@ function firstTone(p){for(const c of p){if(c===" "||c==="'")return 0;if(REV[c])r
 const bigIcon=icon.replace('width="20" height="20"','width="44" height="44"');
 const noZhVoice=()=>{try{const v=speechSynthesis.getVoices();return v.length>0&&!v.some(x=>/^zh|cmn/i.test(x.lang))}catch(e){return true}};
 function startTest(words,label,key){
-  S.run={words:shuffle(words.map(w=>w.h)),pos:0,label,key,wrong:[],ok:0,dir:S.dir};save();answered=false;render();window.scrollTo(0,0)}
+  S.run={words:shuffle(words.map(w=>w.h)),pos:0,label,key,wrong:[],ok:0,dir:S.dir};if(S.mode!=="quiz")go("quiz");else{save();answered=false;render();window.scrollTo(0,0)}answered=false}
 function dailyList(){const t=DAY(),p=ALL.filter(w=>!S.level||w.lv===S.level);
   const due=p.filter(w=>S.srs[w.h]&&S.srs[w.h].due<=t).sort((a,b)=>S.srs[a.h].due-S.srs[b.h].due).slice(0,60);
   const introduced=Object.values(S.srs).filter(r=>r.first===t).length;
   const nw=p.filter(w=>!S.srs[w.h]).slice(0,Math.max(0,NEW_PER_DAY-introduced));
   return{due,nw}}
+function modeChips(after){
+  return `<h2>Modo del test</h2><div class="modechips" id="dirSeg">${Object.entries(DIRS).map(([k,v])=>`<button class="chip" data-dir="${k}" aria-pressed="${S.dir===k}">${v[0]}</button>`).join("")}</div><div class="hint" style="text-align:left">${DIRS[S.dir][1]}</div>`}
+function bindModeChips(redraw){stage.querySelectorAll("#dirSeg button").forEach(b=>b.onclick=()=>{S.dir=b.dataset.dir;save();redraw()})}
 function quizSetup(){
   const lvls=S.level?[S.level]:[1,2];
-  let h=`<h2>Modo del test</h2><div class="modes" id="dirSeg">${Object.entries(DIRS).map(([k,v])=>`<button class="mode" data-dir="${k}" aria-pressed="${S.dir===k}"><b>${v[0]}</b><span>${v[1]}</span></button>`).join("")}</div>`;
-  const {due,nw}=dailyList(),nd=due.length+nw.length;
-  h+=`<div class="daily"><div><b>Repaso de hoy</b><span>${nd?`${due.length} para repasar · ${nw.length} nuevas`:"Hecho por hoy. Vuelve mañana."}</span></div>${nd?`<button class="btn yes" id="dailyBtn">Empezar</button>`:""}</div>`;
-  const nf=Object.keys(S.fails).length;
-  if(nf)h+=`<button class="btn no wide" id="failTest">Test de mis fallos (${nf})</button>`;
+  let h=modeChips();
   for(const lv of lvls){
     const bl=BLOCKS[lv];
     h+=`<h2>HSK ${lv} · por bloques</h2><div class="blocks">${bl.map((b,i)=>{const k=lv+"-"+(i+1),best=S.best[k];
@@ -1137,11 +1180,9 @@ function quizSetup(){
       <button class="btn ghost wide" data-all="${lv}">Test completo HSK ${lv} (${(lv===1?L1:L2).length} palabras)</button>`;
   }
   stage.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">${h}</div>`;
-  stage.querySelectorAll("#dirSeg button").forEach(b=>b.onclick=()=>{S.dir=b.dataset.dir;save();quizSetup()});
+  bindModeChips(quizSetup);
   stage.querySelectorAll(".blk").forEach(b=>b.onclick=()=>{const lv=+b.dataset.lv,i=+b.dataset.b;startTest(BLOCKS[lv][i],`HSK ${lv} · Bloque ${i+1}`,lv+"-"+(i+1))});
   stage.querySelectorAll("[data-all]").forEach(b=>b.onclick=()=>{const lv=+b.dataset.all;startTest(lv===1?L1:L2,`HSK ${lv} completo`,"all-"+lv)});
-  if(nf)$("failTest").onclick=startFailTest;
-  if(nd)$("dailyBtn").onclick=()=>startTest([...due,...nw],"Repaso de hoy","daily");
 }
 function startFailTest(){startTest(Object.keys(S.fails).map(h=>BY[h]).filter(Boolean),"Mis fallos","fails")}
 function quizQuestion(){
@@ -1166,7 +1207,7 @@ function quizQuestion(){
     <div class="row" style="margin-top:12px">${O.map((o,i)=>`<button class="btn opt ${cls}" data-i="${i}">${esc(o.t)}</button>`).join("")}</div>
     <button class="btn yes wide" id="nextBtn" style="margin-top:10px" hidden>Siguiente</button>`;
   if(d==="au")speak(w.h);
-  $("quit").onclick=()=>{S.run=null;save();render()};
+  $("quit").onclick=()=>{S.run=null;save();render();window.scrollTo(0,0)};
   stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     if(answered)return;answered=true;
     const good=O[+b.dataset.i].good;grade(w,good);
@@ -1190,11 +1231,11 @@ function quizResults(){
     <div class="big">${R.ok}<small> / ${n} aciertos</small></div>
     ${wrong.length?`<h2>Has fallado ${wrong.length}</h2><div class="list">${wrong.map(itemHTML).join("")}</div>
       <button class="btn no wide" id="redoWrong">Repetir estos ${wrong.length} fallos</button>`:`<div class="empty">Sin fallos. ¡Perfecto!</div>`}
-    <div class="row"><button class="btn" id="again2">Repetir test</button><button class="btn yes" id="back">Elegir otro</button></div>
+    <div class="row"><button class="btn" id="again2">Repetir test</button><button class="btn yes" id="back">Terminar</button></div>
   </div>`;
   if(wrong.length)$("redoWrong").onclick=()=>startTest(wrong,R.label+" · fallos",R.key==="fails"?"fails":"redo");
   $("again2").onclick=()=>startTest(R.words.map(h=>BY[h]),R.label,R.key);
-  $("back").onclick=()=>{S.run=null;save();render()};
+  $("back").onclick=()=>{S.run=null;save();render();window.scrollTo(0,0)};
 }
 function quiz(){if(!S.run)return quizSetup();if(S.run.pos>=S.run.words.length)return quizResults();quizQuestion()}
 
@@ -1202,14 +1243,14 @@ function quiz(){if(!S.run)return quizSetup();if(S.run.pos>=S.run.words.length)re
 const itemHTML=w=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)}</div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-strokes="${w.h}" aria-label="Orden de trazos">✍</button><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button></div></div>`;
 function failsView(){
   const list=Object.entries(S.fails).map(([h,c])=>({w:BY[h],c})).filter(x=>x.w).sort((a,b)=>b.c-a.c);
-  if(!list.length){stage.innerHTML=`<div class="panel"><div class="empty">Aún no tienes fallos guardados.<br>Cuando falles una palabra en un test o marques "Otra vez" en las tarjetas, aparecerá aquí.</div></div>`;return}
+  if(!list.length){stage.innerHTML=`<div class="panel"><div class="empty">Aún no tienes fallos guardados.<br>Cuando falles una palabra en un test, marques "Otra vez" en las tarjetas o guardes una palabra desde las lecturas, aparecerá aquí.</div></div>`;return}
   stage.innerHTML=`<div class="panel">
     <div class="row"><button class="btn no" id="ft">Test de fallos</button><button class="btn" id="fc">Repasar con tarjetas</button></div>
     <div class="hint" style="text-align:left">Una palabra sale de la lista cuando la aciertas ${FAIL_OK} veces seguidas, en un test o en las tarjetas.</div>
     <div class="list">${list.map(({w,c})=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)} <span class="cnt">×${c}</span>${S.fok[w.h]?`<span class="fok">✓ ${S.fok[w.h]}/${FAIL_OK}</span>`:""}</div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-strokes="${w.h}" aria-label="Orden de trazos">✍</button><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button><button class="x" data-rm="${w.h}" aria-label="Quitar de la lista">Quitar</button></div></div>`).join("")}</div>
   </div>`;
-  $("ft").onclick=()=>{S.mode="quiz";startFailTest()};
-  $("fc").onclick=()=>{S.mode="cards";S.cardFails=true;save();cur=null;render()};
+  $("ft").onclick=startFailTest;
+  $("fc").onclick=()=>{S.cardSet="fails";cur=null;go("cards")};
   stage.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{delete S.fails[b.dataset.rm];delete S.fok[b.dataset.rm];save();updateBadge();failsView()});
 }
 
@@ -1217,7 +1258,7 @@ function failsView(){
 function readList(){
   const list=STORIES.filter(s=>!S.level||s.lv===S.level);
   stage.innerHTML=`<div class="stories">${list.map(s=>`<button class="story" data-id="${s.id}"><span class="tag">HSK ${s.lv}</span><b class="zh">${s.t}</b><span>${esc(s.es)}</span><span class="meta">${s.s.length} frases${S.read[s.id]?" · <em>Leída</em>":""}</span></button>`).join("")}</div>`;
-  stage.querySelectorAll(".story").forEach(b=>b.onclick=()=>{S.story=b.dataset.id;save();render();window.scrollTo(0,0)});
+  stage.querySelectorAll(".story").forEach(b=>b.onclick=()=>{S.story=b.dataset.id;go("read")});
 }
 function reader(){
   const st=STORIES.find(x=>x.id===S.story);if(!st){S.story=null;return readList()}
@@ -1240,7 +1281,7 @@ function reader(){
     <div class="hint" style="text-align:left">Toca o mantén pulsada una palabra para ver qué significa y guardarla.</div>
     <div class="text ${S.py?"":"nopy"} ${S.tr?"":"notr"}" id="txt">${sent}</div>
     <button class="btn ${S.read[st.id]?"":"yes"} wide" id="done">${S.read[st.id]?"Leída ✓":"Marcar como leída"}</button></div>`;
-  $("back2").onclick=()=>{S.story=null;save();render()};
+  $("back2").onclick=()=>{if(history.state&&history.state.story){history.back()}else{S.story=null;save();render()}};
   $("tPy").onclick=()=>{S.py=!S.py;save();$("tPy").setAttribute("aria-pressed",S.py);$("txt").classList.toggle("nopy",!S.py)};
   $("tTr").onclick=()=>{S.tr=!S.tr;save();$("tTr").setAttribute("aria-pressed",S.tr);$("txt").classList.toggle("notr",!S.tr)};
   $("done").onclick=()=>{S.read[st.id]=!S.read[st.id];save();reader()};
@@ -1291,35 +1332,78 @@ $("stQuiz").onclick=()=>{if(!stWriter)return;stWriter.hideCharacter();$("stMsg")
 const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr"];
 function exportCode(){const o={};BK_KEYS.forEach(k=>o[k]=S[k]);return "HANZI1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
 let bkArmed=false;
-$("bkBtn").onclick=()=>{const p=$("bk");p.hidden=!p.hidden;if(!p.hidden){$("bkOut").value=exportCode();$("bkMsg").textContent="";p.scrollIntoView({behavior:"smooth",block:"start"})}};
+
 $("bkCopy").onclick=()=>{const v=$("bkOut").value;const sel=()=>{$("bkOut").focus();$("bkOut").select();$("bkMsg").textContent="Código seleccionado: cópialo con el menú del móvil."};
   try{navigator.clipboard.writeText(v).then(()=>{$("bkMsg").textContent="Código copiado. Guárdalo en un sitio seguro."},sel)}catch(e){sel()}};
 $("bkLoad").onclick=()=>{let o;try{const raw=$("bkIn").value.trim().replace(/^HANZI1:/,"");o=JSON.parse(decodeURIComponent(escape(atob(raw))));if(!o||typeof o.box!=="object")throw 0}
   catch(e){$("bkMsg").textContent="El código no es válido. Comprueba que lo has copiado entero.";bkArmed=false;$("bkLoad").textContent="Recuperar progreso";return}
   if(!bkArmed){bkArmed=true;$("bkLoad").textContent="¿Seguro? Pulsa otra vez para sustituir";$("bkMsg").textContent="";return}
   BK_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});["fails","fok","srs","best","read"].forEach(k=>{if(!S[k])S[k]={}});
-  S.run=null;S.story=null;S.cardFails=false;save();bkArmed=false;$("bkLoad").textContent="Recuperar progreso";$("bkIn").value="";
+  S.run=null;S.story=null;S.cardSet=null;save();bkArmed=false;$("bkLoad").textContent="Recuperar progreso";$("bkIn").value="";
   $("bkOut").value=exportCode();$("bkMsg").textContent="Progreso recuperado.";cur=null;render()};
 
+/* ---------- Temas ---------- */
+function topicsView(){
+  const rows=TOPICS.map(tp=>{const ws=setWords("t:"+tp.k);return{tp,ws}}).filter(x=>x.ws.length);
+  stage.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">${modeChips()}
+    <div class="hint" style="text-align:left">${levelName()}. «Test» usa el modo elegido arriba.</div>
+    <div class="topics">${rows.map(({tp,ws})=>`<div class="topic"><span class="ic">${tp.ic}</span><div class="t"><b>${esc(tp.label)}</b><span>${ws.length} · ${ws.slice(0,6).map(w=>w.h).join(" ")}</span></div><div class="acts"><button class="chip" data-tc="${tp.k}">Tarjetas</button><button class="chip" data-tt="${tp.k}" style="background:var(--jade);color:var(--surface);border-color:var(--jade)">Test</button></div></div>`).join("")}</div></div>`;
+  bindModeChips(topicsView);
+  stage.querySelectorAll("[data-tc]").forEach(b=>b.onclick=()=>{S.cardSet="t:"+b.dataset.tc;cur=null;go("cards")});
+  stage.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{const k=b.dataset.tt;startTest(setWords("t:"+k),TOPIC[k].label,"topic")});
+}
+
+/* ---------- Inicio ---------- */
+const levelName=()=>S.level?`HSK ${S.level}`:"HSK 1 y 2";
+const SECTIONS={cards:"Tarjetas",quiz:"Tests",topics:"Temas",read:"Lecturas",fails:"Fallos",more:"Ajustes"};
+function homeView(){
+  const {due,nw}=dailyList(),nd=due.length+nw.length,nf=Object.keys(S.fails).length,nr=Object.keys(S.read).filter(k=>S.read[k]).length;
+  const R=S.run&&S.run.pos<S.run.words.length?S.run:null;
+  stage.innerHTML=`<div class="home">
+    <div class="seg" id="levelSeg" role="group" aria-label="Nivel">${[1,2,0].map(l=>`<button data-lv="${l}" aria-pressed="${S.level===l}">${l?"HSK "+l:"Los dos"}</button>`).join("")}</div>
+    ${R?`<div class="resume"><div><b>Continuar test</b><span>${esc(R.label)} · ${R.pos}/${R.words.length}</span></div><button class="btn" id="resumeBtn">Seguir</button></div>`:""}
+    <div class="daily"><div><b>Repaso de hoy</b><span>${nd?`${due.length} para repasar · ${nw.length} nuevas`:"Hecho por hoy. Vuelve mañana."}</span><span>Modo: ${DIRS[S.dir][0]} · <button class="link" id="chMode" style="padding:0">cambiar</button></span></div>${nd?`<button class="btn yes" id="dailyBtn">Empezar</button>`:""}</div>
+    <div class="tiles">
+      <button class="tile" data-go="cards"><span class="ic">卡</span><b>Tarjetas</b><span>Repasa palabra a palabra</span></button>
+      <button class="tile" data-go="quiz"><span class="ic">考</span><b>Tests</b><span>Por bloques, en 5 modos</span></button>
+      <button class="tile" data-go="topics"><span class="ic">类</span><b>Temas</b><span>Números, comida, transporte…</span></button>
+      <button class="tile" data-go="read"><span class="ic">读</span><b>Lecturas</b><span>${STORIES.filter(s=>!S.level||s.lv===S.level).length} historias · ${nr} leídas</span></button>
+      <button class="tile" data-go="fails"><span class="ic">错</span><b>Fallos</b><span>${nf?`${nf} ${nf===1?"palabra":"palabras"} para repasar`:"Sin fallos guardados"}</span>${nf?`<span class="badge">${nf}</span>`:""}</button>
+      <button class="tile" data-go="more"><span class="ic">设</span><b>Ajustes</b><span>Copia de seguridad</span></button>
+    </div></div>`;
+  stage.querySelectorAll("#levelSeg button").forEach(b=>b.onclick=()=>{S.level=+b.dataset.lv;save();cur=null;render()});
+  stage.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const m=b.dataset.go;if(m==="cards")S.cardSet=null;if(m==="read")S.story=null;cur=null;go(m)});
+  if(R)$("resumeBtn").onclick=()=>go("quiz");
+  $("chMode").onclick=()=>go("quiz");
+  if(nd)$("dailyBtn").onclick=()=>startTest([...due,...nw],"Repaso de hoy","daily");
+}
+
 /* ---------- General ---------- */
-function updateBadge(){const n=Object.keys(S.fails).length;const b=$("failBadge");b.hidden=!n;b.textContent=n}
+function updateBadge(){}
 function stats(){
-  const p=pool(),k=p.filter(w=>boxOf(w)>=3).length;
+  const p=levelWords(),k=p.filter(w=>boxOf(w)>=3).length;
   $("known").textContent=k;$("total").textContent=p.length;$("barfill").style.width=(p.length?k/p.length*100:0)+"%";
-  $("stats").innerHTML=S.mode==="fails"||S.mode==="read"?"":`<span>Aciertos <b>${sess.ok}</b></span><span>Fallos <b>${sess.bad}</b></span><span>Racha <b>${sess.streak}</b></span>`;
+  $("stats").innerHTML=S.mode==="cards"||S.mode==="quiz"&&S.run?`<span>Aciertos <b>${sess.ok}</b></span><span>Fallos <b>${sess.bad}</b></span><span>Racha <b>${sess.streak}</b></span>`:"";
 }
 function render(){
-  document.querySelectorAll("#modeSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===S.mode));
-  document.querySelectorAll("#levelSeg button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.lv===S.level));
-  $("levelSeg").hidden=S.mode==="fails"||(S.mode==="quiz"&&!!S.run)||(S.mode==="cards"&&S.cardFails)||(S.mode==="read"&&!!S.story);
-  updateBadge();
-  if(S.mode==="cards")cards();else if(S.mode==="quiz")quiz();else if(S.mode==="read")(S.story?reader():readList());else failsView();
+  if(!SECTIONS[S.mode])S.mode="home";
+  $("nav").hidden=S.mode==="home";$("secTitle").textContent=SECTIONS[S.mode]||"";
+  $("moreSec").hidden=S.mode!=="more";$("stage").hidden=S.mode==="more";
+  if(S.mode==="more"){$("bkOut").value=exportCode();$("bkMsg").textContent=""}
+  if(S.mode==="home")homeView();else if(S.mode==="cards")cards();else if(S.mode==="quiz")quiz();else if(S.mode==="topics")topicsView();
+  else if(S.mode==="read")(S.story?reader():readList());else if(S.mode==="fails")failsView();
   stats();
 }
-document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{if(S.mode===b.dataset.mode&&S.mode==="read")S.story=null;if(b.dataset.mode==="cards"&&S.mode!=="cards"){S.cardFails=false;cur=null}S.mode=b.dataset.mode;save();render();window.scrollTo(0,0)});
-document.querySelectorAll("#levelSeg button").forEach(b=>b.onclick=()=>{S.level=+b.dataset.lv;save();cur=null;render()});
+let navDepth=0;
+function go(m){S.mode=m;save();navDepth++;try{history.pushState({mode:m,story:S.story,d:navDepth},"")}catch(e){}answered=false;render();window.scrollTo(0,0)}
+function goHome(){if(navDepth>0){try{history.go(-navDepth);return}catch(e){}}S.mode="home";save();render();window.scrollTo(0,0)}
+$("homeBtn").onclick=goHome;
+window.addEventListener("popstate",e=>{if(!$("stSheet").hidden)closeStrokes();if(!$("sheet").hidden)closeSheet();
+  const st=e.state||{};navDepth=st.d||0;S.mode=st.mode||"home";if(S.mode==="read")S.story=st.story||null;save();answered=false;render();window.scrollTo(0,0)});
 $("reset").onclick=()=>{$("confirmWrap").hidden=false};
-$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;S.read={};S.srs={};S.fok={};S.cardFails=false;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;render()};
+$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;S.read={};S.srs={};S.fok={};S.cardSet=null;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;$("bkMsg").textContent="";render()};
+S.mode="home";S.story=null;
+try{history.replaceState({mode:"home",d:0},"")}catch(e){}
 render();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
