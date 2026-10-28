@@ -117,8 +117,34 @@ rt{font-family:var(--ui);font-size:12px;color:var(--jade);font-weight:600;letter
 .nopy rt{display:none}
 .tr{grid-column:1/-1;font-size:14px;color:var(--muted);line-height:1.45}
 .notr .tr{display:none}
-#sheetBg{position:fixed;inset:0;background:rgba(10,15,12,.4);z-index:20}
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding-top:22px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
+#sheetBg,#stBg{position:fixed;inset:0;background:rgba(10,15,12,.4);z-index:20}
+#sheet,#stSheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding-top:22px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
+.mode:last-child:nth-child(odd){grid-column:1/-1}
+.zhline{display:flex;flex-wrap:wrap;align-items:flex-end;row-gap:8px}
+.w{display:inline-flex;flex-direction:column;align-items:center;padding:0 2px;border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.w.pu{cursor:default;padding:0}
+.grp{display:inline-flex;align-items:flex-end;white-space:nowrap}
+.pyw{font:600 12px/1.3 var(--ui);color:var(--jade);white-space:nowrap}
+.hw{font-size:24px;line-height:1.35}
+.nopy .pyw{display:none}
+.w.sel{background:var(--jade-soft)}
+.w.saved .hw{text-decoration:underline dotted var(--seal);text-underline-offset:5px}
+.blank{display:inline-block;min-width:2.2em;border-bottom:2px solid var(--jade);margin:0 3px;color:var(--jade);text-align:center}
+.daily{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--jade-soft);border:1px solid var(--jade);border-radius:16px;padding:14px 16px}
+.daily div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.daily b{font-size:16px}
+.daily span{font-size:13px;color:var(--muted)}
+.daily .btn{min-height:44px;padding:10px 18px}
+.fok{font-size:11px;color:var(--jade);font-weight:700;margin-left:4px}
+textarea{width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px;resize:vertical;word-break:break-all}
+#bk{text-align:left}
+#bk p{margin:0}
+.mizi{width:240px;height:240px;max-width:100%;position:relative;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.mizi svg.guide{position:absolute;inset:0;width:100%;height:100%}
+.mizi svg.guide line{stroke:var(--line);stroke-dasharray:2 2;stroke-width:.5}
+#stTarget{position:relative;width:100%;height:100%}
+#stBg{z-index:30!important}
+#stSheet{z-index:31!important}
 .dots{display:flex;gap:4px}
 .dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
 .dots span.on{background:var(--jade)}
@@ -147,7 +173,30 @@ rt{font-family:var(--ui);font-size:12px;color:var(--jade);font-weight:600;letter
 
   <main id="stage"></main>
   <div class="stats" id="stats"></div>
-  <p class="foot" id="foot">Tu progreso se guarda en este móvil.<br><button class="link" id="reset">Borrar todo el progreso</button><span id="confirmWrap" hidden> ¿Seguro? <button class="link" id="resetYes">Sí, borrar</button></span></p>
+  <p class="foot" id="foot">Tu progreso se guarda en este móvil.<br><button class="link" id="bkBtn">Copia de seguridad</button> · <button class="link" id="reset">Borrar todo el progreso</button><span id="confirmWrap" hidden> ¿Seguro? <button class="link" id="resetYes">Sí, borrar</button></span></p>
+  <div class="panel" id="bk" hidden>
+    <h2>Exportar mi progreso</h2>
+    <p class="hint" style="text-align:left">Copia este código y guárdalo en una nota o envíatelo por correo. Te sirve para recuperar el progreso o pasarlo a otro móvil.</p>
+    <textarea id="bkOut" readonly rows="3"></textarea>
+    <button class="btn" id="bkCopy">Copiar código</button>
+    <h2>Importar</h2>
+    <p class="hint" style="text-align:left">Pega aquí un código. Sustituye todo el progreso que tengas ahora en este móvil.</p>
+    <textarea id="bkIn" rows="3" placeholder="HANZI1:…"></textarea>
+    <button class="btn yes" id="bkLoad">Recuperar progreso</button>
+    <div class="hint" id="bkMsg" style="text-align:left"></div>
+  </div>
+</div>
+<div id="stBg" hidden></div>
+<div id="stSheet" hidden role="dialog" aria-label="Orden de trazos">
+  <button class="x" id="stClose" style="position:absolute;top:8px;right:8px;font-size:20px" aria-label="Cerrar">✕</button>
+  <span class="tag">Orden de trazos</span>
+  <div class="chips" id="stChars"></div>
+  <div class="mizi"><svg class="guide" viewBox="0 0 100 100" aria-hidden="true"><line x1="0" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/><line x1="50" y1="0" x2="50" y2="100"/><line x1="0" y1="50" x2="100" y2="50"/></svg><div id="stTarget"></div></div>
+  <div class="hint" id="stMsg" style="min-height:1.4em"></div>
+  <div class="row" style="width:100%">
+    <button class="btn" id="stAnim">Ver animación</button>
+    <button class="btn yes" id="stQuiz">Practicar</button>
+  </div>
 </div>
 <div id="sheetBg" hidden></div>
 <div id="sheet" hidden role="dialog" aria-label="Palabra">
@@ -158,8 +207,9 @@ rt{font-family:var(--ui);font-size:12px;color:var(--jade);font-weight:600;letter
   <div class="mean" id="shMean"></div>
   <div class="row" style="width:100%;margin-top:6px">
     <button class="btn" id="shSay">Escuchar</button>
-    <button class="btn yes" id="shSave">Guardar para estudiar</button>
+    <button class="btn" id="shStroke">Trazos</button>
   </div>
+  <button class="btn yes wide" id="shSave">Guardar para estudiar</button>
 </div>
 
 <script>
@@ -214,7 +264,7 @@ const RAW1=`爱|ài|amar
 开|kāi|abrir, conducir
 看|kàn|mirar
 看见|kànjiàn|ver
-块|kuài|yuan (moneda)
+块|kuài|yuan (moneda); trozo
 来|lái|venir
 老师|lǎoshī|profesor
 了|le|partícula de acción completada
@@ -277,7 +327,7 @@ const RAW1=`爱|ài|amar
 我们|wǒmen|nosotros
 五|wǔ|cinco
 喜欢|xǐhuan|gustar
-下|xià|abajo, debajo
+下|xià|abajo; siguiente
 下午|xiàwǔ|por la tarde
 下雨|xià yǔ|llover
 先生|xiānsheng|señor
@@ -552,21 +602,434 @@ const STORIES=[
 ];
 const PUNCT="，。：、「」？！";
 function tok(t){if(PUNCT.includes(t))return{pu:t};const [h,p,m]=t.split("=");const d=BY[h];
-  return{h,p:p||(d?d.p:""),m:m?m.replace(/_/g," "):(d?d.m:""),known:!!d}}
+  return{h,p:p||(d?d.p:""),m:m?m.replace(/_/g," "):(d?d.m:""),known:!!d,ov:!!p}}
+
+Object.assign(EXTRA,{李:["Lǐ","Li (apellido)"],王:["Wáng","Wang (apellido)"],大卫:["Dàwèi","David (nombre)"],美国:["Měiguó","Estados Unidos"],汉字:["hànzì","carácter chino"],以后:["yǐhòu","después, más tarde"],二百:["èrbǎi","doscientos"],点点:["Diǎndian","Diandian (nombre del perro)"],着急:["zháojí","ponerse nervioso"],第二:["dì'èr","segundo"],难:["nán","difícil"],考:["kǎo","hacer un examen"],星期天:["xīngqītiān","domingo"],星期二:["xīngqī'èr","martes"],星期四:["xīngqīsì","jueves"],十五:["shíwǔ","quince"],有点儿:["yǒudiǎnr","un poco (algo negativo)"],斤:["jīn","jin (medio kilo)"],重:["zhòng","pesado"],朋友们:["péngyoumen","amigos"],篮球:["lánqiú","baloncesto"],打:["dǎ","jugar (con pelota), golpear"],张:["zhāng","clasificador (mesas, papeles)"],把:["bǎ","clasificador (sillas)"],好看:["hǎokàn","bonito"],火车:["huǒchē","tren"],一直:["yìzhí","todo el rato"],前:["qián","delante"],路口:["lùkǒu","cruce"],右:["yòu","derecha"]});
+for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
+STORIES.push(
+{id:"h1-escuela",lv:1,t:"我的学校",es:"Mi escuela",s:[
+["我 是 学生 ， 我 在 北京 学习 汉语 。","Soy estudiante y estudio chino en Pekín."],
+["我们 学校 很 大 ， 学生 很 多 。","Mi escuela es muy grande y tiene muchos estudiantes."],
+["学校 前面 有 一 个 商店 ， 后面 有 一 个 饭店 。","Delante de la escuela hay una tienda y detrás, un restaurante."],
+["我 的 汉语 老师 姓 李 。","Mi profesora de chino se apellida Li."],
+["李 老师 很 好 ， 我们 都 很 喜欢 她 。","La profesora Li es muy buena; a todos nos gusta mucho."],
+["上午 ， 我们 听 、 说 、 读 、 写 汉语 。","Por la mañana escuchamos, hablamos, leemos y escribimos en chino."],
+["下午 ， 我 和 同学 在 学校 里 看 书 。","Por la tarde leo en la escuela con mis compañeros."],
+["我 很 喜欢 我 的 学校 。","Me gusta mucho mi escuela."]]},
+{id:"h1-amigo",lv:1,t:"我的朋友",es:"Mi amigo",s:[
+["这 是 我 的 朋友 ， 他 叫 大卫 。","Este es mi amigo; se llama David."],
+["大卫 不 是 中国 人 ， 他 是 美国 人 。","David no es chino, es estadounidense."],
+["他 二十 岁 ， 是 一 个 学生 。","Tiene veinte años y es estudiante."],
+["大卫 会 说 一点儿 汉语 ， 也 会 写 一些 汉字 。","David habla un poco de chino y también sabe escribir algunos caracteres."],
+["他 很 喜欢 中国 菜 ， 也 喜欢 喝 茶 。","Le gusta mucho la comida china y también el té."],
+["星期六 ， 我们 一起 去 看 电影 。","El sábado vamos juntos al cine."],
+["看 电影 以后 ， 我们 坐 出租车 回 家 。","Después de la película volvemos a casa en taxi."],
+["我 很 高兴 认识 大卫 。","Me alegro mucho de conocer a David."]]},
+{id:"h1-tiempo",lv:1,t:"天气怎么样",es:"¿Qué tiempo hace?",s:[
+["今天 天气 怎么样 ？","¿Qué tiempo hace hoy?"],
+["今天 很 热 ， 没有 下雨 。","Hoy hace mucho calor y no ha llovido."],
+["我 和 女儿 在 家 里 ， 不 想 出去 。","Mi hija y yo estamos en casa; no queremos salir."],
+["女儿 说 ： 「 妈妈 ， 我 想 吃 水果 。 」","Mi hija dice: «Mamá, quiero comer fruta.»"],
+["我们 家 里 没有 水果 了 。","En casa ya no nos queda fruta."],
+["下午 四 点 ， 天气 不 太 热 了 。","A las cuatro de la tarde ya no hace tanto calor."],
+["我们 去 商店 买 了 一些 苹果 。","Vamos a la tienda y compramos unas manzanas."],
+["女儿 吃 了 两 个 ， 很 高兴 。","Mi hija se come dos y está muy contenta."]]},
+{id:"h1-telefono",lv:1,t:"打电话",es:"Una llamada",s:[
+["「 喂 ， 你 好 ！ 」","«¿Diga? ¡Hola!»"],
+["「 你 好 ， 是 王 先生 吗 ？ 」","«Hola, ¿es usted el señor Wang?»"],
+["「 是 ， 我 是 。 你 是 谁 ？ 」","«Sí, soy yo. ¿Quién es usted?»"],
+["「 我 是 你 儿子 的 老师 。 」","«Soy la profesora de su hijo.»"],
+["「 老师 好 ！ 有 什么 事情 吗 ？ 」","«¡Hola, profesora! ¿Ocurre algo?»"],
+["「 你 儿子 今天 没有 来 学校 。 」","«Su hijo hoy no ha venido a la escuela.»"],
+["「 对不起 ， 他 生病 了 ， 在 医院 。 」","«Lo siento, se ha puesto enfermo y está en el hospital.»"],
+["「 没关系 ， 明天 见 。 」","«No pasa nada. Hasta mañana.»"]]},
+{id:"h1-ropa",lv:1,t:"买衣服",es:"Comprar ropa",s:[
+["今天 上午 ， 我 去 商店 买 衣服 。","Esta mañana he ido a la tienda a comprar ropa."],
+["商店 里 的 衣服 很 漂亮 。","La ropa de la tienda es muy bonita."],
+["我 看见 一 件 衣服 ， 很 喜欢 。","He visto una prenda que me ha gustado mucho."],
+["我 问 ： 「 这 件 衣服 多少 钱 ？ 」","He preguntado: «¿Cuánto cuesta esta prenda?»"],
+["「 二百 块 。 」","«Doscientos yuanes.»"],
+["太 贵 了 ！ 我 没有 买 。","¡Demasiado cara! No la he comprado."],
+["我 买 了 一 个 杯子 ， 很 小 ， 也 很 漂亮 。","He comprado una taza pequeña y muy bonita."],
+["中午 ， 我 坐 出租车 回 家 了 。","A mediodía he vuelto a casa en taxi."]]},
+{id:"h1-perro",lv:1,t:"小狗点点",es:"El perrito Diandian",s:[
+["我 家 有 一 只 小 狗 。","En mi casa tenemos un perrito."],
+["它 叫 点点 。","Se llama Diandian."],
+["点点 很 小 ， 很 漂亮 。","Diandian es muy pequeño y muy bonito."],
+["它 喜欢 吃 米饭 ， 不 喜欢 吃 水果 。","Le gusta comer arroz, pero no le gusta la fruta."],
+["上午 我 去 工作 ， 点点 在 家 里 睡觉 。","Por la mañana voy a trabajar y Diandian duerme en casa."],
+["下午 我 回 家 ， 点点 很 高兴 。","Por la tarde vuelvo a casa y Diandian se pone muy contento."],
+["晚上 ， 我 和 点点 一起 看 电视 。","Por la noche, Diandian y yo vemos la tele juntos."],
+["我 很 爱 点点 。","Quiero mucho a Diandian."]]},
+{id:"h2-examen",lv:2,t:"考试",es:"El examen",s:[
+["明天 我 有 汉语 考试 。","Mañana tengo examen de chino."],
+["今天 晚上 我 不 能 看 电视 ， 我 要 准备 考试 。","Esta noche no puedo ver la tele: tengo que preparar el examen."],
+["我 哥哥 说 ： 「 别 着急 ， 你 的 汉语 很 好 。 」","Mi hermano me dice: «No te pongas nervioso, tu chino es muy bueno.»"],
+["我 问 了 他 几 个 问题 ， 他 都 告诉 我 了 。","Le hago unas cuantas preguntas y me las responde todas."],
+["十一 点 ， 我 已经 很 累 了 ， 就 去 睡觉 了 。","A las once ya estoy muy cansado y me voy a dormir."],
+["第二 天 早上 ， 我 七 点 就 到 了 教室 。","A la mañana siguiente, a las siete ya estoy en el aula."],
+["考试 的 题 不 太 难 。","Las preguntas del examen no son muy difíciles."],
+["一 个 星期 以后 ， 老师 告诉 我 ， 我 考 得 很 好 ！","Una semana después, el profesor me dice que he sacado muy buena nota."]]},
+{id:"h2-fruta",lv:2,t:"买水果",es:"En la frutería",s:[
+["星期天 ， 我 和 妻子 去 买 水果 。","El domingo, mi mujer y yo vamos a comprar fruta."],
+["商店 离 我们 家 很 近 ， 我们 走 着 去 。","La tienda está muy cerca de casa, así que vamos andando."],
+["西瓜 很 大 ， 也 很 便宜 ， 一 个 十五 块 。","Las sandías son grandes y baratas: quince yuanes cada una."],
+["妻子 说 ： 「 我们 买 一 个 西瓜 吧 。 」","Mi mujer dice: «Compremos una sandía.»"],
+["我 还 想 买 一些 苹果 ， 但是 苹果 有点儿 贵 。","También quiero comprar manzanas, pero están un poco caras."],
+["卖 水果 的 人 说 ： 「 买 两 斤 ， 给 你 便宜 一点儿 。 」","El frutero dice: «Si compra dos jin, se las dejo un poco más baratas.»"],
+["我们 就 买 了 两 斤 苹果 和 一 个 西瓜 。","Así que compramos dos jin de manzanas y una sandía."],
+["回 家 的 路 上 ， 西瓜 非常 重 ！","De camino a casa, ¡la sandía pesa muchísimo!"]]},
+{id:"h2-deporte",lv:2,t:"运动",es:"Hacer deporte",s:[
+["我 非常 喜欢 运动 。","Me encanta hacer deporte."],
+["每 个 星期二 和 星期四 ， 我 去 游泳 。","Todos los martes y jueves voy a nadar."],
+["星期六 下午 ， 我 和 朋友们 一起 踢足球 。","El sábado por la tarde juego al fútbol con mis amigos."],
+["我 弟弟 不 太 喜欢 踢足球 ， 他 喜欢 打篮球 。","A mi hermano pequeño no le gusta mucho el fútbol; le gusta el baloncesto."],
+["他 很 高 ， 篮球 打 得 很 好 。","Es muy alto y juega muy bien al baloncesto."],
+["我 妈妈 每 天 早上 跑步 ， 她 说 运动 对 身体 好 。","Mi madre corre cada mañana; dice que el deporte es bueno para la salud."],
+["虽然 运动 很 累 ， 但是 我 觉得 很 快乐 。","Aunque hacer deporte cansa, me hace sentir feliz."]]},
+{id:"h2-habitacion",lv:2,t:"我的房间",es:"Mi habitación",s:[
+["上=shàng=anterior,_pasado 个 月 ， 我们 有 了 新 家 。","El mes pasado estrenamos casa nueva."],
+["我 的 房间 不 大 ， 但是 很 漂亮 。","Mi habitación no es grande, pero es muy bonita."],
+["房间 里 有 一 张 桌子 和 两 把 椅子 。","En la habitación hay una mesa y dos sillas."],
+["桌子 在 门 的 右边 ， 我 的 电脑 在 桌子 上 。","La mesa está a la derecha de la puerta y mi ordenador está encima de la mesa."],
+["门 的 左边 有 很 多 书 。","A la izquierda de la puerta hay muchos libros."],
+["房间 的 颜色 是 白 的 ， 很 好看 。","La habitación es blanca y queda muy bonita."],
+["晚上 ， 我 在 我 的 房间 里 看 书 ， 非常 舒服 。","Por la noche leo en mi habitación; se está muy a gusto."]]},
+{id:"h2-tren",lv:2,t:"坐火车",es:"En tren",s:[
+["上=shàng=anterior,_pasado 个 星期 ， 我 和 姐姐 坐 火车 去 上海 。","La semana pasada, mi hermana mayor y yo fuimos a Shanghái en tren."],
+["我们 早上 七 点 到 火车站 。","Llegamos a la estación a las siete de la mañana."],
+["火车站 里 人 非常 多 。","En la estación había muchísima gente."],
+["姐姐 去 买 票 ， 我 在 旁边 等 她 。","Mi hermana fue a comprar los billetes y yo la esperé al lado."],
+["火车 八 点 开=kāi=salir_(un_tren) ， 从 北京 到 上海 要 五 个 小时 。","El tren salía a las ocho; de Pekín a Shanghái se tarda cinco horas."],
+["在 火车 上 ， 我们 吃 了 面条 ， 喝 了 咖啡 。","En el tren comimos fideos y tomamos café."],
+["姐姐 一直 在 看 报纸 ， 我 在 睡觉 。","Mi hermana estuvo todo el rato leyendo el periódico y yo, durmiendo."],
+["下午 一 点 ， 我们 就 到 上海 了 。","A la una de la tarde ya habíamos llegado a Shanghái."]]},
+{id:"h2-camino",lv:2,t:"问路",es:"Preguntar el camino",s:[
+["我 第一 次 来 北京 ， 想 去 一 个 宾馆 。","Es la primera vez que vengo a Pekín y quiero ir a un hotel."],
+["我 问 一 个 男 人 ： 「 请 问 ， 宾馆 在 哪儿 ？ 」","Le pregunto a un hombre: «Perdone, ¿dónde está el hotel?»"],
+["他 说 ： 「 往 前 走 ， 到 第二 个 路口 往 右 走 。 」","Me dice: «Siga recto y en el segundo cruce gire a la derecha.»"],
+["「 远 不=bu 远 ？ 」","«¿Está lejos?»"],
+["「 不 远 ， 走 路 十 分钟 就 到 了 。 」","«No, andando se llega en diez minutos.»"],
+["我 说 ： 「 谢谢 您 ！ 」 他 笑 着 说 ： 「 不客气 。 」","Le digo: «¡Muchas gracias!» Y él responde sonriendo: «De nada.»"],
+["十 分钟 以后 ， 我 就 到 宾馆 了 。","Diez minutos después, ya estoy en el hotel."],
+["宾馆 旁边 有 一 个 很 大 的 商店 。","Al lado del hotel hay una tienda muy grande."]]}
+);
+
+const SENT_RAW=`爱|我{爱}我的妈妈。|Quiero a mi madre.
+八|我儿子{八}岁了。|Mi hijo tiene ocho años.
+爸爸|我{爸爸}是医生。|Mi padre es médico.
+杯子|这个{杯子}很漂亮。|Esta taza es muy bonita.
+北京|我想去{北京}。|Quiero ir a Pekín.
+本|我买了三{本}书。|He comprado tres libros.
+不|我{不}喝茶。|No bebo té.
+不客气|“谢谢！”“{不客气}！”|«¡Gracias!» «¡De nada!»
+菜|中国{菜}很好吃。|La comida china está muy rica.
+茶|你喝{茶}吗？|¿Bebes té?
+吃|我想{吃}米饭。|Quiero comer arroz.
+出租车|我们坐{出租车}去吧。|Vamos en taxi.
+打电话|晚上我给妈妈{打电话}。|Por la noche llamo a mi madre.
+大|他的家很{大}。|Su casa es muy grande.
+的|这是我{的}书。|Este es mi libro.
+点|现在三{点}。|Ahora son las tres.
+电脑|我的{电脑}在桌子上。|Mi ordenador está en la mesa.
+电视|爸爸在看{电视}。|Papá está viendo la tele.
+电影|明天我们去看{电影}。|Mañana vamos a ver una película.
+东西|我去商店买{东西}。|Voy a la tienda a comprar cosas.
+都|我们{都}是学生。|Todos nosotros somos estudiantes.
+读|请{读}这个字。|Lee este carácter, por favor.
+对不起|{对不起}，我不会说汉语。|Lo siento, no sé hablar chino.
+多|商店里有很{多}人。|En la tienda hay mucha gente.
+多少|这个杯子{多少}钱？|¿Cuánto cuesta esta taza?
+儿子|她{儿子}在学校。|Su hijo está en la escuela.
+二|今天是三月{二}号。|Hoy es 2 de marzo.
+饭店|中午我们去{饭店}。|A mediodía vamos al restaurante.
+飞机|我坐{飞机}去北京。|Voy a Pekín en avión.
+分钟|请等我五{分钟}。|Espérame cinco minutos, por favor.
+高兴|认识你很{高兴}。|Encantado de conocerte.
+个|我有一{个}儿子。|Tengo un hijo.
+工作|我爸爸在医院{工作}。|Mi padre trabaja en un hospital.
+狗|我家有一只小{狗}。|En mi casa hay un perrito.
+汉语|我在学习{汉语}。|Estoy estudiando chino.
+好|你{好}！|¡Hola!
+号|今天几月几{号}？|¿A qué día estamos hoy?
+喝|我想{喝}水。|Quiero beber agua.
+和|我{和}妈妈去商店。|Voy a la tienda con mamá.
+很|今天{很}冷。|Hoy hace mucho frío.
+后面|学校{后面}有一个商店。|Detrás de la escuela hay una tienda.
+回|我们几点{回}家？|¿A qué hora volvemos a casa?
+会|我{会}说汉语。|Sé hablar chino.
+几|你家有{几}个人？|¿Cuántas personas hay en tu familia?
+家|我{家}在北京。|Mi casa está en Pekín.
+叫|你{叫}什么名字？|¿Cómo te llamas?
+今天|{今天}是星期一。|Hoy es lunes.
+九|现在{九}点。|Son las nueve.
+开|你会{开}车吗？|¿Sabes conducir?
+看|我喜欢{看}书。|Me gusta leer libros.
+看见|你{看见}我的猫了吗？|¿Has visto a mi gato?
+块|这个苹果三{块}钱。|Esta manzana cuesta tres yuanes.
+来|你什么时候{来}我家？|¿Cuándo vienes a mi casa?
+老师|她是我们的汉语{老师}。|Ella es nuestra profesora de chino.
+了|我吃{了}三个苹果。|Me he comido tres manzanas.
+冷|北京的冬天很{冷}。|El invierno en Pekín es muy frío.
+里|杯子{里}有水。|Hay agua en el vaso.
+六|我{六}点起床。|Me levanto a las seis.
+妈妈|我{妈妈}是老师。|Mi madre es profesora.
+吗|你是学生{吗}？|¿Eres estudiante?
+买|我想{买}一本书。|Quiero comprar un libro.
+猫|我喜欢小{猫}。|Me gustan los gatitos.
+没关系|“对不起！”“{没关系}。”|«¡Perdón!» «No pasa nada.»
+没有|我{没有}钱。|No tengo dinero.
+米饭|中午我吃了{米饭}。|A mediodía he comido arroz.
+名字|你的{名字}是什么？|¿Cuál es tu nombre?
+明天|{明天}见！|¡Hasta mañana!
+哪|你是{哪}国人？|¿De qué país eres?
+哪儿|你住在{哪儿}？|¿Dónde vives?
+那|{那}是我的书。|Ese es mi libro.
+呢|我很好，你{呢}？|Estoy bien, ¿y tú?
+能|你{能}来吗？|¿Puedes venir?
+你|{你}好吗？|¿Cómo estás?
+年|我在中国住了三{年}。|He vivido tres años en China.
+女儿|我{女儿}很漂亮。|Mi hija es muy guapa.
+朋友|他是我的好{朋友}。|Es mi buen amigo.
+漂亮|这件衣服很{漂亮}。|Esta ropa es muy bonita.
+苹果|我想吃{苹果}。|Quiero comer una manzana.
+七|我{七}点去学校。|Voy a la escuela a las siete.
+前面|学校{前面}有很多人。|Delante de la escuela hay mucha gente.
+钱|这个多少{钱}？|¿Cuánto cuesta esto?
+请|{请}坐！|¡Siéntese, por favor!
+去|我想{去}中国。|Quiero ir a China.
+热|今天很{热}。|Hoy hace mucho calor.
+人|你是中国{人}吗？|¿Eres chino?
+认识|我{认识}他。|Lo conozco.
+三|我家有{三}个人。|En mi familia somos tres.
+商店|{商店}里有很多东西。|En la tienda hay muchas cosas.
+上|书在桌子{上}。|El libro está encima de la mesa.
+上午|{上午}我在学校。|Por la mañana estoy en la escuela.
+少|商店里人很{少}。|En la tienda hay poca gente.
+谁|他是{谁}？|¿Quién es él?
+什么|你想吃{什么}？|¿Qué quieres comer?
+十|我儿子{十}岁了。|Mi hijo tiene diez años.
+时候|你什么{时候}回家？|¿Cuándo vuelves a casa?
+是|我{是}老师。|Soy profesor.
+书|这是我的{书}。|Este es mi libro.
+水|我想喝{水}。|Quiero beber agua.
+水果|我喜欢吃{水果}。|Me gusta comer fruta.
+睡觉|我十一点{睡觉}。|Me acuesto a las once.
+说|你会{说}汉语吗？|¿Sabes hablar chino?
+四|我们家有{四}个人。|En mi familia somos cuatro.
+岁|你几{岁}了？|¿Cuántos años tienes?
+他|{他}是我爸爸。|Él es mi padre.
+她|{她}是我妈妈。|Ella es mi madre.
+太|这个{太}大了。|Esto es demasiado grande.
+天气|今天{天气}很好。|Hoy hace muy buen tiempo.
+听|请{听}我说。|Escúchame, por favor.
+同学|他是我的{同学}。|Es mi compañero de clase.
+喂|{喂}，你好！|¿Diga? ¡Hola!
+我|{我}叫小明。|Me llamo Xiaoming.
+我们|{我们}是朋友。|Somos amigos.
+五|我有{五}个苹果。|Tengo cinco manzanas.
+喜欢|我{喜欢}喝茶。|Me gusta beber té.
+下|猫在桌子{下}面。|El gato está debajo de la mesa.
+下午|{下午}我去商店。|Por la tarde voy a la tienda.
+下雨|今天{下雨}了。|Hoy ha llovido.
+先生|王{先生}是医生。|El señor Wang es médico.
+现在|{现在}几点？|¿Qué hora es ahora?
+想|我{想}去北京。|Quiero ir a Pekín.
+小|我的猫很{小}。|Mi gato es muy pequeño.
+小姐|王{小姐}，你好！|¡Hola, señorita Wang!
+些|我想买一{些}水果。|Quiero comprar algo de fruta.
+写|你会{写}汉字吗？|¿Sabes escribir caracteres chinos?
+谢谢|{谢谢}你！|¡Gracias!
+星期|今天{星期}几？|¿Qué día de la semana es hoy?
+学生|我是{学生}。|Soy estudiante.
+学习|我在{学习}汉语。|Estoy estudiando chino.
+学校|我们在{学校}。|Estamos en la escuela.
+一|我有{一}个女儿。|Tengo una hija.
+一点儿|我会说{一点儿}汉语。|Hablo un poco de chino.
+衣服|我想买{衣服}。|Quiero comprar ropa.
+医生|我爸爸是{医生}。|Mi padre es médico.
+医院|他在{医院}工作。|Él trabaja en un hospital.
+椅子|请坐在{椅子}上。|Siéntate en la silla, por favor.
+有|我{有}一个哥哥。|Tengo un hermano mayor.
+月|今天是三{月}八号。|Hoy es 8 de marzo.
+在|我{在}家。|Estoy en casa.
+再见|老师，{再见}！|¡Adiós, profesor!
+怎么|这个字{怎么}读？|¿Cómo se lee este carácter?
+怎么样|你的汉语{怎么样}？|¿Qué tal tu chino?
+这|{这}是我的电脑。|Este es mi ordenador.
+中国|我是{中国}人。|Soy chino.
+中午|{中午}我们吃米饭。|A mediodía comemos arroz.
+住|我{住}在北京。|Vivo en Pekín.
+桌子|书在{桌子}上。|El libro está en la mesa.
+字|这个{字}是什么意思？|¿Qué significa este carácter?
+昨天|{昨天}我去了商店。|Ayer fui a la tienda.
+坐|我们{坐}出租车去吧。|Vamos en taxi.
+做|你在{做}什么？|¿Qué estás haciendo?
+吧|我们走{吧}！|¡Vámonos!
+白|这件衣服是{白}的。|Esta ropa es blanca.
+百|这本书一{百}块钱。|Este libro cuesta cien yuanes.
+帮助|谢谢你的{帮助}！|¡Gracias por tu ayuda!
+报纸|爸爸在看{报纸}。|Papá está leyendo el periódico.
+比|我{比}他高。|Soy más alto que él.
+别|{别}说话！|¡No hables!
+宾馆|我们住在{宾馆}里。|Nos alojamos en un hotel.
+长|这条路很{长}。|Este camino es muy largo.
+唱歌|她很喜欢{唱歌}。|A ella le gusta mucho cantar.
+出|他{出}去了。|Ha salido.
+穿|今天很冷，多{穿}点儿衣服。|Hoy hace frío; abrígate más.
+次|我去过北京两{次}。|He estado en Pekín dos veces.
+从|我{从}中国来。|Vengo de China.
+错|这个字写{错}了。|Este carácter está mal escrito.
+打篮球|我们下午去{打篮球}。|Por la tarde vamos a jugar al baloncesto.
+大家|{大家}好！|¡Hola a todos!
+但是|我想去，{但是}我很忙。|Quiero ir, pero estoy muy ocupado.
+到|我们{到}北京了。|Hemos llegado a Pekín.
+得|他跑{得}很快。|Corre muy rápido.
+等|我在{等}你。|Te estoy esperando.
+弟弟|我{弟弟}八岁了。|Mi hermano pequeño tiene ocho años.
+第一|这是我{第一}次来中国。|Es la primera vez que vengo a China.
+懂|你{懂}了吗？|¿Lo has entendido?
+对|你说得很{对}。|Tienes toda la razón.
+房间|我的{房间}很小。|Mi habitación es muy pequeña.
+非常|我{非常}喜欢北京。|Me gusta muchísimo Pekín.
+服务员|{服务员}，我要一杯茶。|¡Camarero! Quiero un té.
+高|我哥哥很{高}。|Mi hermano mayor es muy alto.
+告诉|请{告诉}我你的名字。|Dime tu nombre, por favor.
+哥哥|我{哥哥}是医生。|Mi hermano mayor es médico.
+给|妈妈{给}我买了一件衣服。|Mamá me ha comprado una prenda de ropa.
+公共汽车|我坐{公共汽车}去上班。|Voy al trabajo en autobús.
+公司|他在一家{公司}工作。|Trabaja en una empresa.
+贵|这个手机太{贵}了。|Este móvil es demasiado caro.
+过|我去{过}中国。|He estado en China.
+还|他{还}在睡觉。|Todavía está durmiendo.
+孩子|她有两个{孩子}。|Tiene dos hijos.
+好吃|妈妈做的菜很{好吃}。|La comida que hace mamá está muy rica.
+黑|我的狗是{黑}的。|Mi perro es negro.
+红|她穿着{红}衣服。|Lleva ropa roja.
+火车站|{火车站}离这儿远吗？|¿Está lejos de aquí la estación de tren?
+机场|我们坐出租车去{机场}。|Vamos al aeropuerto en taxi.
+鸡蛋|早上我吃了两个{鸡蛋}。|Por la mañana me comí dos huevos.
+件|这{件}衣服很漂亮。|Esta prenda es muy bonita.
+教室|学生们在{教室}里。|Los estudiantes están en el aula.
+姐姐|我{姐姐}是老师。|Mi hermana mayor es profesora.
+介绍|我来{介绍}一下。|Permitid que os presente.
+进|请{进}！|¡Pase, por favor!
+近|我家离学校很{近}。|Mi casa está muy cerca de la escuela.
+就|他七点{就}起床了。|Ya se levantó a las siete.
+觉得|我{觉得}汉语不难。|Creo que el chino no es difícil.
+咖啡|你喝{咖啡}吗？|¿Tomas café?
+开始|我们{开始}上课吧。|Empecemos la clase.
+考试|明天有{考试}。|Mañana hay examen.
+可能|明天{可能}下雨。|Mañana quizá llueva.
+可以|我{可以}进来吗？|¿Puedo pasar?
+课|今天下午没有{课}。|Esta tarde no hay clase.
+快|他跑得很{快}。|Corre muy rápido.
+快乐|生日{快乐}！|¡Feliz cumpleaños!
+累|我今天很{累}。|Hoy estoy muy cansado.
+离|我家{离}公司很近。|Mi casa está cerca de la empresa.
+两|我有{两}个孩子。|Tengo dos hijos.
+路|我在{路}上看见了他。|Lo vi por la calle.
+旅游|我想去中国{旅游}。|Quiero ir de viaje a China.
+卖|这个商店{卖}水果。|Esta tienda vende fruta.
+慢|请说{慢}一点儿。|Habla más despacio, por favor.
+忙|我今天很{忙}。|Hoy estoy muy ocupado.
+每|我{每}天早上跑步。|Corro todas las mañanas.
+妹妹|我{妹妹}很漂亮。|Mi hermana pequeña es muy guapa.
+门|请开{门}。|Abre la puerta, por favor.
+面条|我喜欢吃{面条}。|Me gustan los fideos.
+男|那个{男}人是我爸爸。|Ese hombre es mi padre.
+您|{您}好！|¡Hola! (formal)
+牛奶|我每天喝{牛奶}。|Bebo leche todos los días.
+女|那个{女}人是我妈妈。|Esa mujer es mi madre.
+旁边|医院{旁边}有一个商店。|Al lado del hospital hay una tienda.
+跑步|我每天早上{跑步}。|Corro todas las mañanas.
+便宜|这件衣服很{便宜}。|Esta ropa es muy barata.
+票|我买了两张电影{票}。|He comprado dos entradas de cine.
+妻子|他的{妻子}是医生。|Su mujer es médica.
+起床|你几点{起床}？|¿A qué hora te levantas?
+千|这个电脑五{千}块。|Este ordenador cuesta cinco mil yuanes.
+铅笔|我没有{铅笔}。|No tengo lápiz.
+晴|今天是{晴}天。|Hoy hace un día despejado.
+去年|我{去年}去了北京。|El año pasado fui a Pekín.
+让|妈妈不{让}我看电视。|Mamá no me deja ver la tele.
+日|今天是五月一{日}。|Hoy es 1 de mayo.
+上班|我八点去{上班}。|Voy a trabajar a las ocho.
+身体|你{身体}好吗？|¿Qué tal de salud?
+生病|他{生病}了。|Se ha puesto enfermo.
+生日|今天是我的{生日}。|Hoy es mi cumpleaños.
+时间|你有{时间}吗？|¿Tienes tiempo?
+事情|我有一件{事情}想告诉你。|Tengo algo que contarte.
+手表|这是我的新{手表}。|Este es mi reloj nuevo.
+手机|你的{手机}在哪儿？|¿Dónde está tu móvil?
+说话|上课的时候别{说话}。|No hables durante la clase.
+送|我{送}你一本书。|Te regalo un libro.
+所以|今天下雨，{所以}我没去学校。|Hoy llueve, así que no he ido a la escuela.
+虽然|{虽然}很累，但是我很快乐。|Aunque estoy cansado, estoy feliz.
+它|这是我的猫，{它}很小。|Este es mi gato; es muy pequeño.
+踢足球|我喜欢{踢足球}。|Me gusta jugar al fútbol.
+题|这个{题}很难。|Este ejercicio es muy difícil.
+跳舞|我们一起去{跳舞}吧。|Vamos a bailar juntos.
+外|{外}面很冷。|Fuera hace mucho frío.
+完|我吃{完}了。|He terminado de comer.
+玩|孩子们在外面{玩}。|Los niños juegan fuera.
+晚上|{晚上}我看电视。|Por la noche veo la tele.
+往|{往}左边走。|Ve hacia la izquierda.
+为什么|你{为什么}不来？|¿Por qué no vienes?
+问|老师，我想{问}一下。|Profesor, quiero preguntar una cosa.
+问题|你有{问题}吗？|¿Tienes alguna pregunta?
+西瓜|我想买一个{西瓜}。|Quiero comprar una sandía.
+希望|我{希望}明天不下雨。|Espero que mañana no llueva.
+洗|我去{洗}衣服。|Voy a lavar la ropa.
+向|{向}前走。|Camina hacia delante.
+小时|我每天工作八个{小时}。|Trabajo ocho horas al día.
+笑|她在{笑}。|Ella se está riendo.
+新|这是我的{新}电脑。|Este es mi ordenador nuevo.
+姓|您{姓}什么？|¿Cuál es su apellido?
+休息|我们{休息}一下吧。|Descansemos un poco.
+雪|下{雪}了！|¡Está nevando!
+颜色|你喜欢什么{颜色}？|¿Qué color te gusta?
+眼睛|她的{眼睛}很漂亮。|Sus ojos son muy bonitos.
+羊肉|我不吃{羊肉}。|No como cordero.
+药|你吃{药}了吗？|¿Te has tomado la medicina?
+要|我{要}一杯咖啡。|Quiero un café.
+也|我{也}是学生。|Yo también soy estudiante.
+一起|我们{一起}去吧。|Vamos juntos.
+一下|请等{一下}。|Espera un momento, por favor.
+意思|这个字是什么{意思}？|¿Qué significa este carácter?
+已经|我{已经}吃饭了。|Ya he comido.
+因为|{因为}下雨，我没去。|Como llovía, no fui.
+阴|今天是{阴}天。|Hoy está nublado.
+游泳|你会{游泳}吗？|¿Sabes nadar?
+右边|商店在学校{右边}。|La tienda está a la derecha de la escuela.
+鱼|我喜欢吃{鱼}。|Me gusta comer pescado.
+远|机场离这儿很{远}。|El aeropuerto está muy lejos de aquí.
+运动|我喜欢{运动}。|Me gusta hacer deporte.
+再|请{再}说一次。|Repítelo, por favor.
+早上|我{早上}六点起床。|Me levanto a las seis de la mañana.
+丈夫|她的{丈夫}是老师。|Su marido es profesor.
+找|你在{找}什么？|¿Qué estás buscando?
+着|门开{着}。|La puerta está abierta.
+真|你的汉语{真}好！|¡Tu chino es realmente bueno!
+正在|我{正在}吃饭。|Estoy comiendo.
+知道|我不{知道}。|No lo sé.
+准备|我在{准备}考试。|Estoy preparando el examen.
+走|他{走}了。|Se ha ido.
+最|我{最}喜欢喝茶。|Lo que más me gusta es el té.
+左边|我家在学校{左边}。|Mi casa está a la izquierda de la escuela.`;
+const SENT={};SENT_RAW.trim().split("\n").forEach(l=>{const[h,s,es]=l.split("|");SENT[h]={s,es}});
 
 const BLOCK=25;
 function blocksOf(list){const n=Math.ceil(list.length/BLOCK),size=Math.ceil(list.length/n),out=[];for(let i=0;i<n;i++)out.push(list.slice(i*size,(i+1)*size));return out}
 const BLOCKS={1:blocksOf(L1),2:blocksOf(L2)};
 
-(()=>{const chars=[...new Set(ALL.map(w=>w.h).join("")+"汉字练习")].join("");
-for(const href of["https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap",
-"https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&display=swap&text="+encodeURIComponent(chars)]){
+(()=>{for(const href of["https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap",
+"https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&display=swap"]){
 const l=document.createElement("link");l.rel="stylesheet";l.href=href;document.head.appendChild(l)}})();
 
 const KEY="hanzi-hsk12-v1";
-let S={box:{},level:1,mode:"quiz",dir:"ht",fails:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardFails:false};
+let S={box:{},level:1,mode:"quiz",dir:"ht",fails:{},fok:{},srs:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardFails:false};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
-if(!S.fails)S.fails={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
+if(!S.fails)S.fails={};if(!S.fok)S.fok={};if(!S.srs)S.srs={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 let sess={ok:0,bad:0,streak:0},cur=null,revealed=false,lastH=null,answered=false;
 
@@ -574,9 +1037,20 @@ const boxOf=w=>S.box[w.h]||0;
 const failWords=()=>Object.keys(S.fails).map(h=>BY[h]).filter(Boolean);
 const pool=()=>{if(S.mode==="cards"&&S.cardFails){const f=failWords();if(f.length)return f}return ALL.filter(w=>!S.level||w.lv===S.level)};
 const lvTag=w=>w.lv?`HSK ${w.lv}`:"Lectura";
-function grade(w,good){const b=boxOf(w);S.box[w.h]=good?Math.min(4,b+1):0;
-  if(good){sess.ok++;sess.streak++}else{sess.bad++;sess.streak=0;S.fails[w.h]=(S.fails[w.h]||0)+1}save()}
-function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+const DAY=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+const NEW_PER_DAY=10,FAIL_OK=2;
+function srsUpd(w,good){const t=DAY();let r=S.srs[w.h];if(!r)r=S.srs[w.h]={iv:0,due:t,first:t,last:-1};
+  if(good){if(r.last!==t||r.iv===0){r.iv=r.iv?Math.min(180,Math.round(r.iv*2.5)):1;r.due=t+r.iv;r.last=t}}
+  else{r.iv=0;r.due=t;r.last=t}}
+function grade(w,good){const b=boxOf(w);S.box[w.h]=good?Math.min(4,b+1):0;srsUpd(w,good);
+  if(good){sess.ok++;sess.streak++;
+    if(S.fails[w.h]){S.fok[w.h]=(S.fok[w.h]||0)+1;if(S.fok[w.h]>=FAIL_OK){delete S.fails[w.h];delete S.fok[w.h]}}}
+  else{sess.bad++;sess.streak=0;S.fails[w.h]=(S.fails[w.h]||0)+1;S.fok[w.h]=0}save()}
+let ZHV=null;
+function pickV(){try{const v=speechSynthesis.getVoices().filter(x=>/^(zh|cmn)/i.test(x.lang)&&!/HK|TW|yue/i.test(x.lang));
+  ZHV=v.find(x=>/google/i.test(x.name))||v.find(x=>/(xiaoxiao|yunxi|tingting|natural|neural|enhanced|premium)/i.test(x.name))||v.find(x=>/CN/i.test(x.lang))||v[0]||null}catch(e){}}
+try{pickV();speechSynthesis.addEventListener("voiceschanged",pickV)}catch(e){}
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";if(ZHV)u.voice=ZHV;u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const icon='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
@@ -584,7 +1058,9 @@ const spk=sm=>`<button class="${sm?"x":"speak"}" data-say aria-label="Escuchar p
 const dots=w=>'<div class="dots" aria-label="Nivel de dominio">'+[1,2,3,4].map(i=>`<span class="${boxOf(w)>=i?"on":""}"></span>`).join("")+'</div>';
 const $=id=>document.getElementById(id);
 const stage=$("stage");
-stage.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b){e.stopPropagation();speak(b.dataset.say||cur?.h||"")}});
+stage.addEventListener("click",e=>{const s=e.target.closest("[data-strokes]");if(s){e.stopPropagation();openStrokes(s.dataset.strokes);return}
+  const b=e.target.closest("[data-say]");if(b){e.stopPropagation();speak(b.dataset.say||cur?.h||"")}});
+const strokeBtn=h=>`<button class="chip" data-strokes="${h}">✍ Trazos</button>`;
 
 /* ---------- Tarjetas ---------- */
 function pickCard(){const p=pool();let tot=0;const ws=p.map(w=>{const wt=w.h===lastH?0:[8,4,2,1,.4][boxOf(w)];tot+=wt;return wt});
@@ -595,7 +1071,7 @@ function cards(newCard){
   stage.innerHTML=(S.cardFails?`<div class="top" style="margin-bottom:10px"><span class="hint" style="text-align:left"><b>Tarjetas · mis fallos</b> (${failWords().length})</span><button class="link" id="cfExit">Salir</button></div>`:"")+`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
     <span class="lvl">${lvTag(w)}</span>${spk()}
     <div class="han ${w.h.length>2?"long":""}">${w.h}</div>
-    ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
+    ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}${strokeBtn(w.h)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
   </div>
   <div class="row" style="margin-top:12px">
     <button class="btn no" id="again" ${revealed?"":"disabled"}>Otra vez</button>
@@ -610,7 +1086,7 @@ function cards(newCard){
 }
 
 /* ---------- Test ---------- */
-const DIRS={ht:["Tonos","Ves el 汉字 y eliges el pinyin con los tonos correctos"],hm:["Significado","Ves el 汉字 y eliges qué significa"],au:["Escucha","Oyes la palabra y eliges el 汉字"],mh:["Al revés","Ves el significado y eliges el 汉字"]};
+const DIRS={fr:["Frases","Completa la frase con la palabra que falta"],ht:["Tonos","Ves el 汉字 y eliges el pinyin con los tonos correctos"],hm:["Significado","Ves el 汉字 y eliges qué significa"],au:["Escucha","Oyes la palabra y eliges el 汉字"],mh:["Al revés","Ves el significado y eliges el 汉字"]};
 if(!DIRS[S.dir])S.dir="ht";
 const TONES={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù","ü":"ǖǘǚǜ"};
 const REV={};for(const[b,m]of Object.entries(TONES))[...m].forEach((c,i)=>REV[c]=[b,i+1]);
@@ -625,13 +1101,33 @@ function toneVariants(p){
   for(let c=0;c<4**n;c++){const t=[];let x=c;for(let k=0;k<n;k++){t.push(x%4+1);x=Math.floor(x/4)}if(t.join()!==orig.join())combos.push(t)}
   return shuffle(combos).slice(0,3).map(t=>{const a=base.slice();pos.forEach((i,k)=>{const b=a[i],low=b.toLowerCase(),m=TONES[low][t[k]-1];a[i]=b===low?m:m.toUpperCase()});return a.join("")});
 }
+const SIM=["买卖","大太天","人八入","日白目","午牛","千十","问门","休体","我找","他她它","在再","的得","哪那","几九儿","少小","东车","今会","明朋","米来","子字","左右","王五","上下","见现","进近","远运","女妈","机几","晚早","雨两","木本","日月","请情","吃喝","买钱","开关","前后","出入","红黑白","冷热","长高","快慢","远近","男女","哥姐弟妹","听看","读写","坐住"];
+const SG={};SIM.forEach((g,i)=>[...g].forEach(c=>(SG[c]=SG[c]||new Set()).add(i)));
+const bare=p=>[...p.toLowerCase()].map(c=>REV[c]?REV[c][0]:c).join("").replace(/[^a-zü]/g,"");
+const normP=p=>p.toLowerCase().replace(/[\s']/g,"");
+function simScore(w,o){let s=Math.random()*2;const a=[...w.h],b=[...o.h];
+  if(a.some(c=>b.includes(c)))s+=3;
+  if(a.some(c=>SG[c]&&b.some(d=>d!==c&&SG[d]&&[...SG[c]].some(g=>SG[d].has(g)))))s+=3;
+  const pa=bare(w.p),pb=bare(o.p);if(pa===pb)s+=2;else if(pa[0]===pb[0])s+=.5;
+  if(a.length===b.length)s+=1;return s}
+function distractors(w,field,d){const src=w.lv?ALL.filter(x=>x.lv===w.lv):ALL;const seen=new Set([w[field]]),out=[];
+  const c=src.filter(o=>o!==w&&!(d==="au"&&normP(o.p)===normP(w.p))).map(o=>[simScore(w,o),o]).sort((x,y)=>y[0]-x[0]);
+  for(const[,o]of c){if(out.length>=3)break;if(seen.has(o[field]))continue;seen.add(o[field]);out.push(o)}return out}
+function firstTone(p){for(const c of p){if(c===" "||c==="'")return 0;if(REV[c])return REV[c][1]}return 0}
 const bigIcon=icon.replace('width="20" height="20"','width="44" height="44"');
 const noZhVoice=()=>{try{const v=speechSynthesis.getVoices();return v.length>0&&!v.some(x=>/^zh|cmn/i.test(x.lang))}catch(e){return true}};
 function startTest(words,label,key){
-  S.run={words:shuffle(words.map(w=>w.h)),pos:0,label,key,wrong:[],ok:0,dir:S.dir};save();answered=false;render()}
+  S.run={words:shuffle(words.map(w=>w.h)),pos:0,label,key,wrong:[],ok:0,dir:S.dir};save();answered=false;render();window.scrollTo(0,0)}
+function dailyList(){const t=DAY(),p=ALL.filter(w=>!S.level||w.lv===S.level);
+  const due=p.filter(w=>S.srs[w.h]&&S.srs[w.h].due<=t).sort((a,b)=>S.srs[a.h].due-S.srs[b.h].due).slice(0,60);
+  const introduced=Object.values(S.srs).filter(r=>r.first===t).length;
+  const nw=p.filter(w=>!S.srs[w.h]).slice(0,Math.max(0,NEW_PER_DAY-introduced));
+  return{due,nw}}
 function quizSetup(){
   const lvls=S.level?[S.level]:[1,2];
   let h=`<h2>Modo del test</h2><div class="modes" id="dirSeg">${Object.entries(DIRS).map(([k,v])=>`<button class="mode" data-dir="${k}" aria-pressed="${S.dir===k}"><b>${v[0]}</b><span>${v[1]}</span></button>`).join("")}</div>`;
+  const {due,nw}=dailyList(),nd=due.length+nw.length;
+  h+=`<div class="daily"><div><b>Repaso de hoy</b><span>${nd?`${due.length} para repasar · ${nw.length} nuevas`:"Hecho por hoy. Vuelve mañana."}</span></div>${nd?`<button class="btn yes" id="dailyBtn">Empezar</button>`:""}</div>`;
   const nf=Object.keys(S.fails).length;
   if(nf)h+=`<button class="btn no wide" id="failTest">Test de mis fallos (${nf})</button>`;
   for(const lv of lvls){
@@ -645,27 +1141,28 @@ function quizSetup(){
   stage.querySelectorAll(".blk").forEach(b=>b.onclick=()=>{const lv=+b.dataset.lv,i=+b.dataset.b;startTest(BLOCKS[lv][i],`HSK ${lv} · Bloque ${i+1}`,lv+"-"+(i+1))});
   stage.querySelectorAll("[data-all]").forEach(b=>b.onclick=()=>{const lv=+b.dataset.all;startTest(lv===1?L1:L2,`HSK ${lv} completo`,"all-"+lv)});
   if(nf)$("failTest").onclick=startFailTest;
+  if(nd)$("dailyBtn").onclick=()=>startTest([...due,...nw],"Repaso de hoy","daily");
 }
 function startFailTest(){startTest(Object.keys(S.fails).map(h=>BY[h]).filter(Boolean),"Mis fallos","fails")}
 function quizQuestion(){
   const R=S.run,w=BY[R.words[R.pos]];cur=w;
-  if(!DIRS[R.dir])R.dir="ht";const d=R.dir;
+  if(!DIRS[R.dir])R.dir="ht";let d=R.dir;
+  const sn=SENT[w.h];if(d==="fr"&&!sn)d="hm";
   let O,cls="";
   const tv=d==="ht"?toneVariants(w.p):[];
   if(d==="ht"&&tv.length){O=shuffle([{t:w.p,good:true},...tv.map(t=>({t,good:false}))]);cls="pyopt"}
   else{
-    const field=d==="mh"||d==="au"?"h":d==="ht"?"p":"m";if(field==="h")cls="hz";else if(field==="p")cls="pyopt";
-    const src=w.lv?ALL.filter(x=>x.lv===w.lv):ALL;const opts=[w],seen=new Set([w[field]]);let g=0;
-    while(opts.length<4&&g++<300){const o=src[Math.floor(Math.random()*src.length)];if(!seen.has(o[field])){seen.add(o[field]);opts.push(o)}}
-    O=shuffle(opts).map(o=>({t:o[field],good:o===w}));
+    const field=d==="mh"||d==="au"||d==="fr"?"h":d==="ht"?"p":"m";if(field==="h")cls="hz";else if(field==="p")cls="pyopt";
+    O=shuffle([w,...distractors(w,field,d)]).map(o=>({t:o[field],good:o===w}));
   }
   let q;
-  if(d==="mh")q=`<div class="prompt">${esc(w.m)}</div><div class="hint">Elige el carácter</div>`;
+  if(d==="fr")q=`<div class="prompt" style="font-family:var(--han);font-weight:500;font-size:26px;max-width:none;line-height:1.5" id="frS">${esc(sn.s).replace(/\{.*?\}/,'<span class="blank" id="blank">\u3000</span>')}</div><div class="hint">${esc(sn.es)}</div>`;
+  else if(d==="mh")q=`<div class="prompt">${esc(w.m)}</div><div class="hint">Elige el carácter</div>`;
   else if(d==="au")q=`<button class="bigspk" data-say="${w.h}" aria-label="Volver a escuchar">${bigIcon}</button><div class="hint">Escucha y elige la palabra. Toca el botón para repetir.</div>${noZhVoice()?`<div class="hint" style="color:var(--seal)">Tu móvil no tiene voz en chino. Instálala en Ajustes → Idioma → Texto a voz.</div>`:""}`;
   else q=`<div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="hint">${d==="ht"?"Elige el pinyin con los tonos correctos":"¿Qué significa?"}</div>`;
   stage.innerHTML=`<div class="top"><span class="hint" style="text-align:left"><b>${esc(R.label)}</b> · ${DIRS[d][0]} · ${R.pos+1}/${R.words.length}</span><button class="link" id="quit">Salir</button></div>
     <div class="bar" style="margin:8px 0 12px"><i style="width:${R.pos/R.words.length*100}%"></i></div>
-    <div class="card" style="min-height:230px"><span class="lvl">${lvTag(w)}</span>${d==="au"?"":spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
+    <div class="card" style="min-height:230px"><span class="lvl">${lvTag(w)}</span>${d==="au"||d==="fr"?"":spk()}${q}<div id="after" style="display:flex;flex-direction:column;align-items:center;gap:6px"></div></div>
     <div class="row" style="margin-top:12px">${O.map((o,i)=>`<button class="btn opt ${cls}" data-i="${i}">${esc(o.t)}</button>`).join("")}</div>
     <button class="btn yes wide" id="nextBtn" style="margin-top:10px" hidden>Siguiente</button>`;
   if(d==="au")speak(w.h);
@@ -673,19 +1170,20 @@ function quizQuestion(){
   stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     if(answered)return;answered=true;
     const good=O[+b.dataset.i].good;grade(w,good);
-    if(good){R.ok++;if(R.key==="fails"||S.fails[w.h]){delete S.fails[w.h]}}else R.wrong.push(w.h);
+    if(good)R.ok++;else R.wrong.push(w.h);
     save();updateBadge();
     stage.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(O[+x.dataset.i].good)x.classList.add("ok")});
     if(!good)b.classList.add("bad");
-    $("after").innerHTML=`${d==="au"?`<div class="han ${w.h.length>2?"long":""}" style="font-size:56px">${w.h}</div>`:""}<div class="py">${esc(w.p)}</div>${d==="mh"?"":`<div class="mean">${esc(w.m)}</div>`}`;
-    speak(w.h);stats();
+    if(d==="fr"){const bl=$("blank");bl.textContent=w.h}
+    $("after").innerHTML=`${d==="au"?`<div class="han ${w.h.length>2?"long":""}" style="font-size:56px">${w.h}</div>`:""}${d==="ht"?"":`<div class="py">${esc(w.p)}</div>`}${d==="mh"?"":`<div class="mean">${esc(w.m)}</div>`}<div class="chips" style="justify-content:center">${d==="fr"?`<button class="chip" data-say="${sn.s.replace(/[{}]/g,"")}">🔊 Frase</button>`:""}${strokeBtn(w.h)}</div>`;
+    speak(d==="fr"?sn.s.replace(/[{}]/g,""):w.h);stats();
     const nb=$("nextBtn");nb.hidden=false;nb.focus();
     nb.onclick=()=>{R.pos++;answered=false;save();render()};
   });
 }
 function quizResults(){
   const R=S.run,n=R.words.length;
-  if(R.key!=="fails"&&(S.best[R.key]==null||R.ok>S.best[R.key]))S.best[R.key]=R.ok;save();
+  if(/^(\d-\d+|all-\d)$/.test(R.key)&&(S.best[R.key]==null||R.ok>S.best[R.key]))S.best[R.key]=R.ok;save();
   const wrong=[...new Set(R.wrong)].map(h=>BY[h]);
   stage.innerHTML=`<div class="panel">
     <div class="hint" style="text-align:left"><b>${esc(R.label)}</b> · terminado</div>
@@ -701,18 +1199,18 @@ function quizResults(){
 function quiz(){if(!S.run)return quizSetup();if(S.run.pos>=S.run.words.length)return quizResults();quizQuestion()}
 
 /* ---------- Fallos ---------- */
-const itemHTML=w=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)}</div><div>${esc(w.m)}</div></div><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button></div>`;
+const itemHTML=w=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)}</div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-strokes="${w.h}" aria-label="Orden de trazos">✍</button><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button></div></div>`;
 function failsView(){
   const list=Object.entries(S.fails).map(([h,c])=>({w:BY[h],c})).filter(x=>x.w).sort((a,b)=>b.c-a.c);
   if(!list.length){stage.innerHTML=`<div class="panel"><div class="empty">Aún no tienes fallos guardados.<br>Cuando falles una palabra en un test o marques "Otra vez" en las tarjetas, aparecerá aquí.</div></div>`;return}
   stage.innerHTML=`<div class="panel">
     <div class="row"><button class="btn no" id="ft">Test de fallos</button><button class="btn" id="fc">Repasar con tarjetas</button></div>
-    <div class="hint" style="text-align:left">Cuando aciertes una palabra en un test, sale de la lista.</div>
-    <div class="list">${list.map(({w,c})=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)} <span class="cnt">×${c}</span></div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button><button class="x" data-rm="${w.h}" aria-label="Quitar de la lista">Quitar</button></div></div>`).join("")}</div>
+    <div class="hint" style="text-align:left">Una palabra sale de la lista cuando la aciertas ${FAIL_OK} veces seguidas, en un test o en las tarjetas.</div>
+    <div class="list">${list.map(({w,c})=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)} <span class="cnt">×${c}</span>${S.fok[w.h]?`<span class="fok">✓ ${S.fok[w.h]}/${FAIL_OK}</span>`:""}</div><div>${esc(w.m)}</div></div><div style="display:flex"><button class="x" data-strokes="${w.h}" aria-label="Orden de trazos">✍</button><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button><button class="x" data-rm="${w.h}" aria-label="Quitar de la lista">Quitar</button></div></div>`).join("")}</div>
   </div>`;
   $("ft").onclick=()=>{S.mode="quiz";startFailTest()};
   $("fc").onclick=()=>{S.mode="cards";S.cardFails=true;save();cur=null;render()};
-  stage.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{delete S.fails[b.dataset.rm];save();updateBadge();failsView()});
+  stage.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{delete S.fails[b.dataset.rm];delete S.fok[b.dataset.rm];save();updateBadge();failsView()});
 }
 
 /* ---------- Lecturas ---------- */
@@ -724,7 +1222,15 @@ function readList(){
 function reader(){
   const st=STORIES.find(x=>x.id===S.story);if(!st){S.story=null;return readList()}
   const sent=st.s.map(([zh,es])=>{const T=zh.split(" ").map(tok);
-    const line=T.map(x=>x.pu?`<span>${x.pu}</span>`:`<ruby class="w${S.fails[x.h]?" saved":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}">${x.h}<rt>${esc(x.p)}</rt></ruby>`).join("");
+    T.forEach((x,i)=>{if(x.pu||x.ov||(x.h!=="不"&&x.h!=="一"))return;const n=T[i+1],tn=n&&!n.pu?firstTone(n.p):-1;
+      x.p=x.h==="不"?(tn===4?"bú":"bù"):(tn===-1?"yī":tn===4?"yí":"yì")});
+    const cell=x=>x.pu?`<span class="w pu"><span class="pyw">\u00a0</span><span class="hw">${x.pu}</span></span>`:`<span class="w${S.fails[x.h]?" saved":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}"><span class="pyw">${esc(x.p)}</span><span class="hw">${x.h}</span></span>`;
+    const groups=[];let g=null,lead=[];
+    T.forEach(x=>{if(x.pu&&"「“".includes(x.pu)){lead.push(x);return}
+      if(x.pu){(g||(g=[],groups.push(g),g)).push(x);return}
+      g=[...lead,x];lead=[];groups.push(g)});
+    if(lead.length)groups.push(lead);
+    const line=groups.map(gr=>`<span class="grp">${gr.map(cell).join("")}</span>`).join("");
     const say=T.map(x=>x.pu||x.h).join("");
     return `<div class="sent"><div class="zhline">${line}</div><button class="x" data-say="${say}" aria-label="Escuchar la frase">${icon}</button><div class="tr">${esc(es)}</div></div>`}).join("");
   stage.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
@@ -738,12 +1244,12 @@ function reader(){
   $("tPy").onclick=()=>{S.py=!S.py;save();$("tPy").setAttribute("aria-pressed",S.py);$("txt").classList.toggle("nopy",!S.py)};
   $("tTr").onclick=()=>{S.tr=!S.tr;save();$("tTr").setAttribute("aria-pressed",S.tr);$("txt").classList.toggle("notr",!S.tr)};
   $("done").onclick=()=>{S.read[st.id]=!S.read[st.id];save();reader()};
-  const open=e=>{const w=e.target.closest("ruby.w");if(!w)return;e.preventDefault();openSheet(w)};
+  const open=e=>{const w=e.target.closest(".w[data-h]");if(!w)return;e.preventDefault();openSheet(w)};
   $("txt").addEventListener("click",open);$("txt").addEventListener("contextmenu",open);
 }
 let shEl=null;
 function openSheet(el){
-  document.querySelectorAll("ruby.w.sel").forEach(x=>x.classList.remove("sel"));el.classList.add("sel");shEl=el;
+  document.querySelectorAll(".w.sel").forEach(x=>x.classList.remove("sel"));el.classList.add("sel");shEl=el;
   const h=el.dataset.h,d=BY[h];
   $("shTag").textContent=d&&d.lv?`HSK ${d.lv}`:"Fuera de HSK 1-2";
   $("shHan").textContent=h;$("shPy").textContent=el.dataset.p;$("shMean").textContent=el.dataset.m;
@@ -753,9 +1259,47 @@ function syncSave(){const h=shEl.dataset.h,b=$("shSave");const on=!!S.fails[h];b
 function closeSheet(){$("sheet").hidden=true;$("sheetBg").hidden=true;if(shEl)shEl.classList.remove("sel")}
 $("sheetBg").onclick=closeSheet;$("sheetClose").onclick=closeSheet;
 $("shSay").onclick=()=>speak(shEl.dataset.h);
-$("shSave").onclick=()=>{const h=shEl.dataset.h;if(S.fails[h])delete S.fails[h];else S.fails[h]=1;save();updateBadge();syncSave();
-  document.querySelectorAll(`ruby.w[data-h="${h}"]`).forEach(x=>x.classList.toggle("saved",!!S.fails[h]))};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+$("shStroke").onclick=()=>openStrokes(shEl.dataset.h);
+$("shSave").onclick=()=>{const h=shEl.dataset.h;if(S.fails[h])delete S.fails[h];else S.fails[h]=1;delete S.fok[h];save();updateBadge();syncSave();
+  document.querySelectorAll(`.w[data-h="${h}"]`).forEach(x=>x.classList.toggle("saved",!!S.fails[h]))};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("stSheet").hidden)closeStrokes();else closeSheet()}});
+
+/* ---------- Trazos ---------- */
+let HWp=null,stWriter=null,stWord="",stIdx=0;
+function loadHW(){if(window.HanziWriter)return Promise.resolve();
+  return HWp||(HWp=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js";s.onload=res;s.onerror=()=>{HWp=null;s.remove();rej()};document.head.appendChild(s)}))}
+function openStrokes(word){stWord=word;stIdx=0;$("stSheet").hidden=false;$("stBg").hidden=false;drawStroke()}
+function closeStrokes(){try{stWriter&&stWriter.cancelQuiz()}catch(e){}$("stSheet").hidden=true;$("stBg").hidden=true}
+function drawStroke(){
+  const chars=[...stWord];
+  $("stChars").innerHTML=chars.length>1?chars.map((c,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===stIdx}" style="font-family:var(--han);font-size:18px">${c}</button>`).join(""):"";
+  $("stChars").querySelectorAll("button").forEach(b=>b.onclick=()=>{stIdx=+b.dataset.i;drawStroke()});
+  const box=$("stTarget");box.innerHTML="";stWriter=null;$("stMsg").textContent="Cargando…";
+  loadHW().then(()=>{const cs=getComputedStyle(document.documentElement),v=n=>cs.getPropertyValue(n).trim();
+    const size=box.clientWidth||240;
+    stWriter=HanziWriter.create(box,chars[stIdx],{width:size,height:size,padding:14,strokeColor:v("--ink"),radicalColor:v("--jade"),outlineColor:v("--line"),drawingColor:v("--jade"),highlightColor:v("--jade"),delayBetweenStrokes:250,
+      onLoadCharDataSuccess:()=>{$("stMsg").textContent=""},
+      onLoadCharDataError:()=>{$("stMsg").textContent="No se han podido cargar los trazos. Comprueba la conexión."}});
+    stWriter.animateCharacter();
+  }).catch(()=>{$("stMsg").textContent="Necesitas conexión a internet para ver los trazos."})}
+$("stBg").onclick=closeStrokes;$("stClose").onclick=closeStrokes;
+$("stAnim").onclick=()=>{if(!stWriter)return;try{stWriter.cancelQuiz()}catch(e){}stWriter.showCharacter();stWriter.animateCharacter();$("stMsg").textContent=""};
+$("stQuiz").onclick=()=>{if(!stWriter)return;stWriter.hideCharacter();$("stMsg").textContent="Dibuja los trazos en orden con el dedo.";
+  stWriter.quiz({onComplete:s=>{$("stMsg").textContent=s.totalMistakes?`Terminado, con ${s.totalMistakes} ${s.totalMistakes===1?"error":"errores"}.`:"¡Perfecto!"}})};
+
+/* ---------- Copia de seguridad ---------- */
+const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr"];
+function exportCode(){const o={};BK_KEYS.forEach(k=>o[k]=S[k]);return "HANZI1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+let bkArmed=false;
+$("bkBtn").onclick=()=>{const p=$("bk");p.hidden=!p.hidden;if(!p.hidden){$("bkOut").value=exportCode();$("bkMsg").textContent="";p.scrollIntoView({behavior:"smooth",block:"start"})}};
+$("bkCopy").onclick=()=>{const v=$("bkOut").value;const sel=()=>{$("bkOut").focus();$("bkOut").select();$("bkMsg").textContent="Código seleccionado: cópialo con el menú del móvil."};
+  try{navigator.clipboard.writeText(v).then(()=>{$("bkMsg").textContent="Código copiado. Guárdalo en un sitio seguro."},sel)}catch(e){sel()}};
+$("bkLoad").onclick=()=>{let o;try{const raw=$("bkIn").value.trim().replace(/^HANZI1:/,"");o=JSON.parse(decodeURIComponent(escape(atob(raw))));if(!o||typeof o.box!=="object")throw 0}
+  catch(e){$("bkMsg").textContent="El código no es válido. Comprueba que lo has copiado entero.";bkArmed=false;$("bkLoad").textContent="Recuperar progreso";return}
+  if(!bkArmed){bkArmed=true;$("bkLoad").textContent="¿Seguro? Pulsa otra vez para sustituir";$("bkMsg").textContent="";return}
+  BK_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});["fails","fok","srs","best","read"].forEach(k=>{if(!S[k])S[k]={}});
+  S.run=null;S.story=null;S.cardFails=false;save();bkArmed=false;$("bkLoad").textContent="Recuperar progreso";$("bkIn").value="";
+  $("bkOut").value=exportCode();$("bkMsg").textContent="Progreso recuperado.";cur=null;render()};
 
 /* ---------- General ---------- */
 function updateBadge(){const n=Object.keys(S.fails).length;const b=$("failBadge");b.hidden=!n;b.textContent=n}
@@ -775,7 +1319,7 @@ function render(){
 document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{if(S.mode===b.dataset.mode&&S.mode==="read")S.story=null;if(b.dataset.mode==="cards"&&S.mode!=="cards"){S.cardFails=false;cur=null}S.mode=b.dataset.mode;save();render();window.scrollTo(0,0)});
 document.querySelectorAll("#levelSeg button").forEach(b=>b.onclick=()=>{S.level=+b.dataset.lv;save();cur=null;render()});
 $("reset").onclick=()=>{$("confirmWrap").hidden=false};
-$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;S.read={};S.cardFails=false;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;render()};
+$("resetYes").onclick=()=>{S.box={};S.fails={};S.best={};S.run=null;S.read={};S.srs={};S.fok={};S.cardFails=false;sess={ok:0,bad:0,streak:0};save();$("confirmWrap").hidden=true;cur=null;render()};
 render();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
