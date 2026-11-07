@@ -103,6 +103,14 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
 .story .meta em{color:var(--jade);font-style:normal;font-weight:700}
 .tag{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 .story .tag{position:absolute;top:14px;right:16px}
+.exs{width:100%;display:flex;flex-direction:column;gap:4px;margin-top:6px;border-top:1px solid var(--line);padding-top:10px}
+.exl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 8px}
+.ex{display:flex;flex-direction:column;gap:2px;text-align:left;border:0;background:transparent;font:inherit;color:var(--ink);padding:8px;border-radius:12px;cursor:pointer;width:100%;-webkit-tap-highlight-color:transparent}
+.ex:active{background:var(--jade-soft)}
+.exz{font-family:var(--han);font-size:20px;line-height:1.45}
+.exz b{color:var(--jade);font-weight:700}
+.exp{font-size:13px;color:var(--jade);font-weight:600;line-height:1.4}
+.exe{font-size:13px;color:var(--muted);line-height:1.4}
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 14px;font:600 13px var(--ui);cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
@@ -1066,6 +1074,309 @@ const SENT_RAW=`爱|我{爱}我的妈妈。|Quiero a mi madre.
 最|我{最}喜欢喝茶。|Lo que más me gusta es el té.
 左边|我家在学校{左边}。|Mi casa está a la izquierda de la escuela.`;
 const SENT={};SENT_RAW.trim().split("\n").forEach(l=>{const[h,s,es]=l.split("|");SENT[h]={s,es}});
+/* Segunda frase de ejemplo por palabra (se muestra en las tarjetas) */
+const SENT2_RAW=`爱|他很{爱}他的妻子。|Él quiere mucho a su esposa.
+八|现在是早上{八}点。|Ahora son las ocho de la mañana.
+爸爸|{爸爸}每天坐公共汽车去上班。|Papá va a trabajar en autobús todos los días.
+杯子|桌子上有两个{杯子}。|Encima de la mesa hay dos vasos.
+北京|{北京}的冬天很冷。|El invierno en Pekín es muy frío.
+本|这{本}书是谁的？|¿De quién es este libro?
+不|他今天{不}去学校。|Hoy él no va a la escuela.
+不客气|“谢谢你的帮助！”“{不客气}！”|«¡Gracias por tu ayuda!» «¡De nada!»
+菜|妈妈做的{菜}非常好吃。|La comida que hace mamá está buenísima.
+茶|我每天早上喝一杯{茶}。|Todas las mañanas me tomo una taza de té.
+吃|你们中午{吃}什么？|¿Qué coméis a mediodía?
+出租车|{出租车}来了，我们走吧。|Ya ha llegado el taxi, vámonos.
+打电话|我下午给你{打电话}。|Te llamo por la tarde.
+大|这个房间不{大}。|Esta habitación no es grande.
+的|那是老师{的}电脑。|Ese es el ordenador del profesor.
+点|我们八{点}半去学校。|Vamos a la escuela a las ocho y media.
+电脑|我想买一个新{电脑}。|Quiero comprarme un ordenador nuevo.
+电视|我晚上不看{电视}。|Por la noche no veo la tele.
+电影|这个{电影}很好看。|Esta película está muy bien.
+东西|你想吃什么{东西}？|¿Qué te apetece comer?
+都|我的朋友{都}喜欢喝咖啡。|A todos mis amigos les gusta el café.
+读|老师，这个字怎么{读}？|Profesor, ¿cómo se lee este carácter?
+对不起|{对不起}，我来晚了。|Perdón, he llegado tarde.
+多|我有很{多}中国朋友。|Tengo muchos amigos chinos.
+多少|你们学校有{多少}学生？|¿Cuántos estudiantes hay en vuestra escuela?
+儿子|我{儿子}喜欢踢足球。|A mi hijo le gusta jugar al fútbol.
+二|我住在{二}楼。|Vivo en el segundo piso.
+饭店|这个{饭店}的菜很好吃。|La comida de este restaurante está muy rica.
+飞机|{飞机}几点到北京？|¿A qué hora llega el avión a Pekín?
+分钟|我家离学校十{分钟}。|Mi casa está a diez minutos de la escuela.
+高兴|今天我很{高兴}。|Hoy estoy muy contento.
+个|这{个}苹果很大。|Esta manzana es muy grande.
+工作|你在哪儿{工作}？|¿Dónde trabajas?
+狗|我的{狗}很喜欢跑步。|A mi perro le encanta correr.
+汉语|你的{汉语}说得很好。|Hablas muy bien chino.
+好|今天天气很{好}。|Hoy hace muy buen tiempo.
+号|我的生日是五月十{号}。|Mi cumpleaños es el diez de mayo.
+喝|你想{喝}什么？|¿Qué quieres beber?
+和|我{和}我的朋友一起去看电影。|Voy al cine con mi amigo.
+很|这件衣服{很}便宜。|Esta ropa es muy barata.
+后面|我的猫在椅子{后面}。|Mi gato está detrás de la silla.
+回|我明天{回}北京。|Mañana vuelvo a Pekín.
+会|你{会}游泳吗？|¿Sabes nadar?
+几|现在{几}点？|¿Qué hora es?
+家|欢迎你来我{家}！|¡Bienvenido a mi casa!
+叫|我的狗{叫}小白。|Mi perro se llama Xiaobai.
+今天|{今天}晚上你有时间吗？|¿Tienes tiempo esta noche?
+九|我晚上{九}点回家。|Vuelvo a casa a las nueve de la noche.
+开|请{开}一下门。|Abre la puerta un momento, por favor.
+看|我想{看}一下你的书。|Quiero echar un vistazo a tu libro.
+看见|我没{看见}你的手机。|No he visto tu móvil.
+块|这本书二十{块}。|Este libro cuesta veinte yuanes.
+来|他{来}中国三年了。|Hace tres años que vino a China.
+老师|{老师}，我有一个问题。|Profesor, tengo una pregunta.
+了|他去医院{了}。|Ha ido al hospital.
+冷|外面很{冷}，多穿点儿衣服。|Fuera hace mucho frío, abrígate.
+里|教室{里}有很多学生。|En el aula hay muchos estudiantes.
+六|我们{六}点吃晚饭。|Cenamos a las seis.
+妈妈|{妈妈}在厨房做饭。|Mamá está cocinando.
+吗|你喜欢喝茶{吗}？|¿Te gusta el té?
+买|你想{买}什么？|¿Qué quieres comprar?
+猫|{猫}在椅子上睡觉。|El gato está durmiendo en la silla.
+没关系|“我来晚了。”“{没关系}！”|«He llegado tarde.» «¡No pasa nada!»
+没有|今天我{没有}课。|Hoy no tengo clase.
+米饭|你想吃{米饭}还是面条？|¿Quieres arroz o fideos?
+名字|这个字是我的{名字}。|Este carácter es mi nombre.
+明天|{明天}我们去看电影吧。|Mañana vamos al cine.
+哪|你喜欢{哪}个颜色？|¿Qué color te gusta?
+哪儿|你的手机在{哪儿}？|¿Dónde está tu móvil?
+那|{那}个人是谁？|¿Quién es esa persona?
+呢|我的书{呢}？|¿Y mi libro? (¿dónde está?)
+能|明天你{能}来我家吗？|¿Puedes venir mañana a mi casa?
+你|{你}叫什么名字？|¿Cómo te llamas?
+年|我在北京学习了两{年}汉语。|Estudié chino dos años en Pekín.
+女儿|我{女儿}今年六岁。|Mi hija tiene seis años.
+朋友|我有很多中国{朋友}。|Tengo muchos amigos chinos.
+漂亮|你的房间真{漂亮}！|¡Tu habitación es preciosa!
+苹果|这些{苹果}多少钱？|¿Cuánto cuestan estas manzanas?
+七|今天是{七}月一号。|Hoy es uno de julio.
+前面|{前面}有一个医院。|Ahí delante hay un hospital.
+钱|我没有{钱}了。|Me he quedado sin dinero.
+请|{请}问，火车站在哪儿？|Perdone, ¿dónde está la estación de tren?
+去|你{去}哪儿？|¿Adónde vas?
+热|我想喝{热}水。|Quiero beber agua caliente.
+人|你家有几个{人}？|¿Cuántas personas hay en tu familia?
+认识|很高兴{认识}你！|¡Encantado de conocerte!
+三|我有{三}个中国朋友。|Tengo tres amigos chinos.
+商店|学校旁边有一个{商店}。|Al lado de la escuela hay una tienda.
+上|我的手机在桌子{上}。|Mi móvil está encima de la mesa.
+上午|明天{上午}我有课。|Mañana por la mañana tengo clase.
+少|我会说的汉语很{少}。|Sé hablar muy poco chino.
+谁|这是{谁}的书？|¿De quién es este libro?
+什么|这是{什么}？|¿Qué es esto?
+十|我们{十}点去商店吧。|Vamos a la tienda a las diez.
+时候|你什么{时候}去北京？|¿Cuándo vas a Pekín?
+是|他{是}我的朋友。|Él es mi amigo.
+书|我在看一本中文{书}。|Estoy leyendo un libro en chino.
+水|请给我一杯{水}。|Deme un vaso de agua, por favor.
+水果|你喜欢吃什么{水果}？|¿Qué fruta te gusta?
+睡觉|孩子们已经{睡觉}了。|Los niños ya se han ido a dormir.
+说|请{说}慢一点儿。|Habla un poco más despacio, por favor.
+四|我在中国住了{四}年。|He vivido cuatro años en China.
+岁|我女儿今年五{岁}。|Mi hija tiene cinco años.
+他|{他}在医院工作。|Él trabaja en un hospital.
+她|{她}是我的汉语老师。|Ella es mi profesora de chino.
+太|今天{太}热了！|¡Hoy hace demasiado calor!
+天气|明天{天气}怎么样？|¿Qué tiempo hará mañana?
+听|你{听}，外面下雨了。|Escucha, fuera está lloviendo.
+同学|我和我的{同学}一起学习。|Estudio con mis compañeros de clase.
+喂|{喂}，你在哪儿？|¿Diga? ¿Dónde estás?
+我|{我}是西班牙人。|Soy español.
+我们|{我们}一起吃饭吧。|Comamos juntos.
+五|我每天工作{五}个小时。|Trabajo cinco horas al día.
+喜欢|你{喜欢}看电影吗？|¿Te gusta ver películas?
+下|{下}个星期我去北京。|La semana que viene voy a Pekín.
+下午|今天{下午}我没有课。|Esta tarde no tengo clase.
+下雨|明天可能{下雨}。|Puede que mañana llueva.
+先生|李{先生}，您好！|¡Buenos días, señor Li!
+现在|我{现在}很忙。|Ahora estoy muy ocupado.
+想|我{想}喝一杯咖啡。|Me apetece un café.
+小|这件衣服太{小}了。|Esta ropa es demasiado pequeña.
+小姐|{小姐}，这个多少钱？|Señorita, ¿cuánto cuesta esto?
+些|这{些}书都是我的。|Todos estos libros son míos.
+写|请{写}你的名字。|Escribe tu nombre, por favor.
+谢谢|{谢谢}你的帮助！|¡Gracias por tu ayuda!
+星期|一个{星期}有七天。|Una semana tiene siete días.
+学生|我们班有二十个{学生}。|En nuestra clase hay veinte estudiantes.
+学习|我每天{学习}两个小时汉语。|Estudio chino dos horas al día.
+学校|我们{学校}很大。|Nuestra escuela es muy grande.
+一|我想买{一}本书。|Quiero comprar un libro.
+一点儿|我想喝{一点儿}水。|Quiero beber un poco de agua.
+衣服|这件{衣服}多少钱？|¿Cuánto cuesta esta ropa?
+医生|我想去看{医生}。|Quiero ir al médico.
+医院|他生病了，在{医院}里。|Está enfermo y está en el hospital.
+椅子|这把{椅子}很舒服。|Esta silla es muy cómoda.
+有|你{有}时间吗？|¿Tienes tiempo?
+月|这个{月}我很忙。|Este mes estoy muy ocupado.
+在|妈妈{在}商店买东西。|Mamá está comprando en la tienda.
+再见|明天{再见}！|¡Hasta mañana!
+怎么|去火车站{怎么}走？|¿Cómo se va a la estación de tren?
+怎么样|这件衣服{怎么样}？|¿Qué tal esta ropa?
+这|{这}是我的朋友。|Este es mi amigo.
+中国|我想去{中国}旅游。|Quiero ir de viaje a China.
+中午|今天{中午}你吃什么？|¿Qué comes hoy a mediodía?
+住|你{住}在哪儿？|¿Dónde vives?
+桌子|我的{桌子}上有很多书。|En mi mesa hay muchos libros.
+字|这个汉{字}很难写。|Este carácter es muy difícil de escribir.
+昨天|{昨天}晚上我没睡觉。|Anoche no dormí.
+坐|请{坐}！|¡Siéntate, por favor!
+做|妈妈在{做}饭。|Mamá está haciendo la comida.
+吧|我们一起去吃饭{吧}！|¡Vamos a comer juntos!
+白|我的猫是{白}色的。|Mi gato es blanco.
+百|我们学校有五{百}个学生。|En nuestra escuela hay quinientos estudiantes.
+帮助|我可以{帮助}你吗？|¿Puedo ayudarte?
+报纸|今天的{报纸}在哪儿？|¿Dónde está el periódico de hoy?
+比|今天{比}昨天冷。|Hoy hace más frío que ayer.
+别|{别}看电视了，去睡觉吧！|¡Deja de ver la tele y vete a dormir!
+宾馆|这个{宾馆}离火车站很近。|Este hotel está muy cerca de la estación de tren.
+长|她的头发很{长}。|Tiene el pelo muy largo.
+唱歌|我们晚上去{唱歌}吧。|Vamos a cantar esta noche.
+出|他{出}门了。|Ha salido de casa.
+穿|她今天{穿}了一件红衣服。|Hoy lleva ropa roja.
+次|请再说一{次}。|Dilo otra vez, por favor.
+从|我{从}家里走到学校。|Voy andando de casa a la escuela.
+错|对不起，我说{错}了。|Perdón, me he equivocado.
+打篮球|我哥哥很喜欢{打篮球}。|A mi hermano mayor le encanta jugar al baloncesto.
+大家|{大家}一起唱歌吧！|¡Cantemos todos juntos!
+但是|这件衣服很漂亮，{但是}太贵了。|Esta ropa es muy bonita, pero es demasiado cara.
+到|你几点{到}家？|¿A qué hora llegas a casa?
+得|她汉语说{得}很好。|Ella habla chino muy bien.
+等|请{等}一下！|¡Espera un momento, por favor!
+弟弟|我{弟弟}在学校学习。|Mi hermano pequeño estudia en la escuela.
+第一|这是我{第一}次喝中国茶。|Es la primera vez que bebo té chino.
+懂|我不{懂}你说的话。|No entiendo lo que dices.
+对|{对}，我是西班牙人。|Sí, soy español.
+房间|这个{房间}很大。|Esta habitación es muy grande.
+非常|这个电影{非常}好看。|Esta película está genial.
+服务员|{服务员}，多少钱？|Camarero, ¿cuánto es?
+高|这个房子很{高}。|Esta casa es muy alta.
+告诉|我{告诉}你一件事情。|Te voy a contar una cosa.
+哥哥|我{哥哥}比我高。|Mi hermano mayor es más alto que yo.
+给|请{给}我一杯水。|Dame un vaso de agua, por favor.
+公共汽车|我们坐{公共汽车}去吧。|Vamos en autobús.
+公司|我们{公司}很大。|Nuestra empresa es muy grande.
+贵|这件衣服不{贵}。|Esta ropa no es cara.
+过|你吃{过}中国菜吗？|¿Has probado alguna vez la comida china?
+还|我{还}想喝一杯茶。|Quiero otra taza de té.
+孩子|这个{孩子}很漂亮。|Este niño es muy guapo.
+好吃|这个西瓜真{好吃}！|¡Qué buena está esta sandía!
+黑|外面天{黑}了。|Fuera ya se ha hecho de noche.
+红|我喜欢{红}色。|Me gusta el rojo.
+火车站|我在{火车站}等你。|Te espero en la estación de tren.
+机场|{机场}离这儿很远。|El aeropuerto está muy lejos de aquí.
+鸡蛋|我想买十个{鸡蛋}。|Quiero comprar diez huevos.
+件|我想买一{件}衣服。|Quiero comprarme una prenda de ropa.
+教室|我们的{教室}在二楼。|Nuestra aula está en el segundo piso.
+姐姐|我{姐姐}很喜欢唱歌。|A mi hermana mayor le encanta cantar.
+介绍|请你{介绍}一下你的家。|Por favor, habla un poco de tu familia.
+进|老师{进}教室了。|El profesor ha entrado en el aula.
+近|商店离这儿很{近}。|La tienda está muy cerca de aquí.
+就|我{就}要走了。|Ya me voy.
+觉得|你{觉得}这件衣服怎么样？|¿Qué te parece esta ropa?
+咖啡|我每天早上喝一杯{咖啡}。|Todas las mañanas me tomo un café.
+开始|电影几点{开始}？|¿A qué hora empieza la película?
+考试|这次{考试}很难。|Este examen ha sido muy difícil.
+可能|他{可能}不来了。|Puede que no venga.
+可以|你{可以}帮助我吗？|¿Me puedes ayudar?
+课|我们今天有三节{课}。|Hoy tenemos tres clases.
+快|{快}来！|¡Ven rápido!
+快乐|新年{快乐}！|¡Feliz año nuevo!
+累|你{累}了吗？休息一下吧。|¿Estás cansado? Descansa un poco.
+离|学校{离}这儿远吗？|¿Está lejos de aquí la escuela?
+两|我买了{两}个苹果。|He comprado dos manzanas.
+路|这条{路}叫什么名字？|¿Cómo se llama esta calle?
+旅游|你喜欢{旅游}吗？|¿Te gusta viajar?
+卖|那个商店{卖}衣服。|Esa tienda vende ropa.
+慢|他吃饭很{慢}。|Come muy despacio.
+忙|你最近{忙}吗？|¿Estás ocupado últimamente?
+每|我{每}个星期去一次商店。|Voy a la tienda una vez por semana.
+妹妹|我{妹妹}今年十岁。|Mi hermana pequeña tiene diez años.
+门|请关{门}。|Cierra la puerta, por favor.
+面条|我想吃一碗{面条}。|Quiero comer un cuenco de fideos.
+男|我们班有十个{男}学生。|En nuestra clase hay diez chicos.
+您|{您}叫什么名字？|¿Cómo se llama usted?
+牛奶|你要{牛奶}吗？|¿Quieres leche?
+女|她是我的{女}朋友。|Ella es mi novia.
+旁边|我的家在学校{旁边}。|Mi casa está al lado de la escuela.
+跑步|你喜欢{跑步}吗？|¿Te gusta correr?
+便宜|这里的水果很{便宜}。|Aquí la fruta es muy barata.
+票|你买火车{票}了吗？|¿Has comprado el billete de tren?
+妻子|我{妻子}在公司工作。|Mi esposa trabaja en una empresa.
+起床|我每天早上七点{起床}。|Todos los días me levanto a las siete.
+千|这件衣服一{千}块钱。|Esta ropa cuesta mil yuanes.
+铅笔|这是谁的{铅笔}？|¿De quién es este lápiz?
+晴|明天是{晴}天。|Mañana hará sol.
+去年|{去年}我认识了他。|Lo conocí el año pasado.
+让|老师{让}我们写汉字。|El profesor nos hace escribir caracteres.
+日|十月一{日}是中国的国庆节。|El uno de octubre es la fiesta nacional de China.
+上班|你每天几点{上班}？|¿A qué hora entras a trabajar cada día?
+身体|我爸爸{身体}很好。|Mi padre está muy bien de salud.
+生病|我{生病}了，今天不去上班。|Estoy enfermo, hoy no voy a trabajar.
+生日|你的{生日}是几月几号？|¿Qué día es tu cumpleaños?
+时间|我没有{时间}看电视。|No tengo tiempo para ver la tele.
+事情|你有什么{事情}吗？|¿Qué pasa? / ¿Querías algo?
+手表|我的{手表}在哪儿？|¿Dónde está mi reloj?
+手机|我的{手机}没有电了。|Mi móvil se ha quedado sin batería.
+说话|请大声{说话}。|Habla más alto, por favor.
+送|我{送}你去机场吧。|Te llevo al aeropuerto.
+所以|我很累，{所以}想休息一下。|Estoy muy cansado, así que quiero descansar un poco.
+虽然|{虽然}汉语很难，但是我很喜欢。|Aunque el chino es difícil, me gusta mucho.
+它|我有一只狗，{它}叫小白。|Tengo un perro, se llama Xiaobai.
+踢足球|孩子们在外面{踢足球}。|Los niños están jugando al fútbol fuera.
+题|这个{题}我不会。|No sé hacer este ejercicio.
+跳舞|她{跳舞}跳得很好。|Ella baila muy bien.
+外|我在门{外}等你。|Te espero fuera de la puerta.
+完|你看{完}这本书了吗？|¿Has terminado de leer este libro?
+玩|周末我们去哪儿{玩}？|¿Adónde vamos a divertirnos el fin de semana?
+晚上|你{晚上}几点睡觉？|¿A qué hora te acuestas por la noche?
+往|{往}前走，商店就在那儿。|Sigue recto, la tienda está ahí.
+为什么|你{为什么}学习汉语？|¿Por qué estudias chino?
+问|我可以{问}你一个问题吗？|¿Puedo hacerte una pregunta?
+问题|这个{问题}很难。|Esta pregunta es muy difícil.
+西瓜|夏天我喜欢吃{西瓜}。|En verano me gusta comer sandía.
+希望|我{希望}你快乐。|Espero que seas feliz.
+洗|吃饭前要{洗}手。|Hay que lavarse las manos antes de comer.
+向|{向}右走，医院就在那儿。|Ve a la derecha, el hospital está ahí.
+小时|我坐了两个{小时}的火车。|Estuve dos horas en el tren.
+笑|你为什么{笑}？|¿Por qué te ríes?
+新|这是我的{新}手机。|Este es mi móvil nuevo.
+姓|我{姓}王，叫王方。|Me apellido Wang, me llamo Wang Fang.
+休息|今天是星期天，我在家{休息}。|Hoy es domingo, descanso en casa.
+雪|北京冬天下{雪}吗？|¿Nieva en Pekín en invierno?
+颜色|这件衣服是什么{颜色}的？|¿De qué color es esta ropa?
+眼睛|我妹妹的{眼睛}很大。|Mi hermana pequeña tiene los ojos muy grandes.
+羊肉|这个饭店的{羊肉}很好吃。|El cordero de este restaurante está muy rico.
+药|吃了{药}，你的身体就会好。|Cuando te tomes la medicina, te pondrás bien.
+要|你{要}什么？|¿Qué quieres?
+也|他{也}喜欢喝茶。|A él también le gusta el té.
+一起|你想和我{一起}去吗？|¿Quieres venir conmigo?
+一下|你看{一下}这本书。|Echa un vistazo a este libro.
+意思|你说的是什么{意思}？|¿Qué quieres decir?
+已经|现在{已经}十点了。|Ya son las diez.
+因为|我没去学校，{因为}我生病了。|No fui a la escuela porque estaba enfermo.
+阴|今天是{阴}天，可能会下雨。|Hoy está nublado, puede que llueva.
+游泳|夏天我每天去{游泳}。|En verano voy a nadar todos los días.
+右边|我的{右边}是我的朋友。|A mi derecha está mi amigo.
+鱼|这条{鱼}很大。|Este pez es muy grande.
+远|你家离这儿{远}吗？|¿Tu casa está lejos de aquí?
+运动|你喜欢什么{运动}？|¿Qué deporte te gusta?
+再|我们明天{再}来吧。|Volvamos mañana.
+早上|{早上}好！|¡Buenos días!
+丈夫|我{丈夫}在医院工作。|Mi marido trabaja en el hospital.
+找|我在{找}我的手机。|Estoy buscando mi móvil.
+着|他笑{着}说：“你好！”|Dijo sonriendo: «¡Hola!»
+真|今天{真}冷！|¡Qué frío hace hoy!
+正在|老师{正在}上课。|El profesor está dando clase.
+知道|你{知道}他的名字吗？|¿Sabes cómo se llama?
+准备|我们{准备}去中国旅游。|Estamos preparando un viaje a China.
+走|我们{走}吧！|¡Vámonos!
+最|你{最}喜欢什么颜色？|¿Cuál es tu color favorito?
+左边|商店在医院{左边}。|La tienda está a la izquierda del hospital.`;
+const SENT2={};SENT2_RAW.trim().split("\n").forEach(l=>{const[h,s,es]=l.split("|");SENT2[h]={s,es}});
 
 const TOPICS=[
 ["num","数","Números y medidas","八 本 二 个 九 六 七 三 十 四 五 一 一点儿 些 多 少 岁 百 次 第一 件 两 千"],
@@ -1088,6 +1399,7 @@ const TOPICS=[
 ].map(([k,ic,label,ws])=>({k,ic,label,words:ws.split(" ").filter(h=>BY[h]&&BY[h].lv)}));
 const TOPIC=Object.fromEntries(TOPICS.map(t=>[t.k,t]));
 
+Object.assign(EXTRA,{晚:["wǎn","tarde"],晚饭:["wǎnfàn","cena"],楼:["lóu","planta, piso"],欢迎:["huānyíng","bienvenido"],厨房:["chúfáng","cocina"],房子:["fángzi","casa"],今年:["jīnnián","este año"],中文:["Zhōngwén","chino (lengua)"],西班牙:["Xībānyá","España"],西班牙人:["Xībānyárén","español"],班:["bān","clase (grupo)"],白色:["báisè","blanco"],红色:["hóngsè","rojo"],头发:["tóufa","pelo"],话:["huà","palabras, lo dicho"],节:["jié","clasificador de clases"],国庆节:["Guóqìngjié","fiesta nacional"],关:["guān","cerrar"],碗:["wǎn","cuenco"],电:["diàn","electricidad, batería"],大声:["dàshēng","en voz alta"],跳:["tiào","saltar"],周末:["zhōumò","fin de semana"],那儿:["nàr","allí"],夏天:["xiàtiān","verano"],手:["shǒu","mano"]});
 Object.assign(EXTRA,{车:["chē","coche"],国:["guó","país"],下面:["xiàmian","debajo"],外面:["wàimian","fuera"],条:["tiáo","clasificador (cosas largas)"],跑:["pǎo","correr"],这儿:["zhèr","aquí"],学生们:["xuéshengmen","estudiantes"],孩子们:["háizimen","niños"],没:["méi","no (en pasado)"]});
 for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
 const PUNCT2="，。？！：、“”「」";
@@ -1098,8 +1410,18 @@ function segment(s){const T=[];let i=0;
       if(BY[sub]){T.push({h:sub,p:BY[sub].p,m:BY[sub].m});i+=L;hit=true;break}}
     if(!hit){T.push({h:s[i],p:"",m:""});i++}}
   return T}
+function sentPy(zh){const T=sandhi(segment(zh).map(x=>Object.assign({},x)));const M={"，":",","。":".","？":"?","！":"!","：":":","、":",","“":"“","”":"”","「":"“","」":"”"};
+  let o="",cap=true,open=false;
+  T.forEach(x=>{if(x.pu){const c=M[x.pu]||x.pu;if(c==="“"){o+=(o?" ":"")+c;open=true}else o+=c;if(/[.?!:“]/.test(c))cap=true;return}
+    let s=x.p||x.h;if(cap){s=s.charAt(0).toUpperCase()+s.slice(1);cap=false}
+    o+=(o&&!open?" ":"")+s;open=false});
+  return o}
+function exHTML(h){const L=[SENT[h],SENT2[h]].filter(Boolean);if(!L.length)return"";
+  return `<div class="exs"><div class="exl">Ejemplos · toca una frase para escucharla</div>`+L.map(x=>{const zh=x.s.replace(/[{}]/g,"");
+    return `<button class="ex" data-say="${esc(zh)}"><span class="exz">${esc(x.s).replace(/\{(.*?)\}/,"<b>$1</b>")}</span><span class="exp">${esc(sentPy(zh))}</span><span class="exe">${esc(x.es)}</span></button>`}).join("")+`</div>`}
 const SENTS=[];
 for(const[h,{s,es}]of Object.entries(SENT)){const zh=s.replace(/[{}]/g,"");SENTS.push({zh,es,lv:BY[h]?BY[h].lv:1,T:segment(zh)})}
+for(const[h,{s,es}]of Object.entries(SENT2)){const zh=s.replace(/[{}]/g,"");SENTS.push({zh,es,lv:BY[h]?BY[h].lv:1,T:segment(zh)})}
 for(const st of STORIES)for(const[z,es]of st.s){const T=z.split(" ").map(tok);SENTS.push({zh:T.map(x=>x.pu||x.h).join(""),es,lv:st.lv,T})}
 SENTS.forEach(x=>{x.nw=x.T.filter(t=>!t.pu).length});
 
@@ -1160,7 +1482,7 @@ function cards(newCard){
   stage.innerHTML=`<div class="top" style="margin-bottom:10px"><span class="hint" style="text-align:left"><b>${S.cardSet?esc(setLabel(S.cardSet)):"Todas las palabras"}</b> · ${levelName()} · ${pool().length} palabras</span>${S.cardSet?`<button class="link" id="cfExit">Ver todas</button>`:""}</div>`+`<div class="card tap" id="cardBox" role="button" tabindex="0" aria-label="Mostrar respuesta">
     <span class="lvl">${lvTag(w)}</span>${spk()}
     <div class="han ${w.h.length>2?"long":""}">${w.h}</div>
-    ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}${strokeBtn(w.h)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
+    ${revealed?`<div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>${dots(w)}${strokeBtn(w.h)}${exHTML(w.h)}`:`<div class="hint">Toca para ver pinyin y significado</div>`}
   </div>
   <div class="row" style="margin-top:12px">
     <button class="btn no" id="again" ${revealed?"":"disabled"}>Otra vez</button>
@@ -1242,7 +1564,7 @@ function startFailTest(){askMode(Object.keys(S.fails).map(h=>BY[h]).filter(Boole
 function quizQuestion(){
   const R=S.run,w=BY[R.words[R.pos]];cur=w;
   if(!DIRS[R.dir])R.dir="ht";let d=R.dir;
-  const sn=SENT[w.h];if(d==="fr"&&!sn)d="hm";
+  const sn=(SENT2[w.h]&&Math.random()<.5)?SENT2[w.h]:SENT[w.h];if(d==="fr"&&!sn)d="hm";
   let O,cls="";
   const tv=d==="ht"?toneVariants(w.p):[];
   if(d==="ht"&&tv.length){O=shuffle([{t:w.p,good:true},...tv.map(t=>({t,good:false}))]);cls="pyopt"}
@@ -1310,6 +1632,7 @@ function failsView(){
 
 /* ---------- Lecturas ---------- */
 function sandhi(T){T.forEach((x,i)=>{if(x.pu||x.ov||(x.h!=="不"&&x.h!=="一"))return;const n=T[i+1],tn=n&&!n.pu?firstTone(n.p):-1;
+  const pv=T[i-1];if(x.h==="一"&&((pv&&!pv.pu&&/[十第月]$/.test(pv.h))||(n&&!n.pu&&/^[日号月]/.test(n.h)))){x.p="yī";return}
   x.p=x.h==="不"?(tn===4?"bú":"bù"):(tn===-1?"yī":tn===4?"yí":"yì")});return T}
 function wordLine(T){sandhi(T);
   const cell=x=>x.pu?`<span class="w pu"><span class="pyw">\u00a0</span><span class="hw">${x.pu}</span></span>`:`<span class="w${S.fails[x.h]?" saved":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}"><span class="pyw">${esc(x.p)||"\u00a0"}</span><span class="hw">${x.h}</span></span>`;
