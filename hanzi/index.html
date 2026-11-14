@@ -111,6 +111,19 @@ button:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
 .exz b{color:var(--jade);font-weight:700}
 .exp{font-size:13px;color:var(--jade);font-weight:600;line-height:1.4}
 .exe{font-size:13px;color:var(--muted);line-height:1.4}
+.look{display:flex;flex-direction:column;gap:10px}
+.lkin{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:14px 16px;font:500 20px var(--ui);outline:none}
+.lkin:focus{border-color:var(--jade);box-shadow:0 0 0 3px var(--jade-soft)}
+.lkgrp{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.lkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.lkr{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
+.lkr:active{background:var(--jade-soft)}
+.lkh{font-family:var(--han);font-size:28px;line-height:1.2}
+.lkp{font-size:13px;font-weight:600;color:var(--jade)}
+.lkt{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.lkm{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.3}
+.lkcard{min-height:0;padding-top:34px}
+.lkcard .exs .exl{padding:0 0 4px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 14px;font:600 13px var(--ui);cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
@@ -1402,6 +1415,78 @@ const TOPIC=Object.fromEntries(TOPICS.map(t=>[t.k,t]));
 Object.assign(EXTRA,{晚:["wǎn","tarde"],晚饭:["wǎnfàn","cena"],楼:["lóu","planta, piso"],欢迎:["huānyíng","bienvenido"],厨房:["chúfáng","cocina"],房子:["fángzi","casa"],今年:["jīnnián","este año"],中文:["Zhōngwén","chino (lengua)"],西班牙:["Xībānyá","España"],西班牙人:["Xībānyárén","español"],班:["bān","clase (grupo)"],白色:["báisè","blanco"],红色:["hóngsè","rojo"],头发:["tóufa","pelo"],话:["huà","palabras, lo dicho"],节:["jié","clasificador de clases"],国庆节:["Guóqìngjié","fiesta nacional"],关:["guān","cerrar"],碗:["wǎn","cuenco"],电:["diàn","electricidad, batería"],大声:["dàshēng","en voz alta"],跳:["tiào","saltar"],周末:["zhōumò","fin de semana"],那儿:["nàr","allí"],夏天:["xiàtiān","verano"],手:["shǒu","mano"]});
 Object.assign(EXTRA,{车:["chē","coche"],国:["guó","país"],下面:["xiàmian","debajo"],外面:["wàimian","fuera"],条:["tiáo","clasificador (cosas largas)"],跑:["pǎo","correr"],这儿:["zhèr","aquí"],学生们:["xuéshengmen","estudiantes"],孩子们:["háizimen","niños"],没:["méi","no (en pasado)"]});
 for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
+/* Vocabulario del libro de clase (lección 6) para el buscador */
+const LEX_RAW=`你好|nǐ hǎo|hola
+新|xīn|nuevo (adj.)
+同学|tóngxué|compañero de clase; compañero de escuela
+食堂|shítáng|comedor
+哪儿|nǎr|dónde (pron. interr.)
+校门|xiàomén|puerta de la escuela; entrada del campus
+门|mén|puerta; portón; entrada
+右边|yòubian|derecha (lado)
+右|yòu|derecha
+边|bian|lado (sufijo)
+跟|gēn|con (prep.)
+这儿|zhèr|aquí
+地图|dìtú|mapa
+给|gěi|a; para (prep.)
+旁边|pángbiān|lado; al lado de
+办公楼|bàngōnglóu|edificio de oficinas; edificio de administración
+办公|bàngōng|despachar asuntos; trabajar (en una oficina)
+楼|lóu|edificio; planta, piso
+图书馆|túshūguǎn|biblioteca
+书|shū|libro
+北边|běibian|norte (lado)
+北|běi|norte
+西边|xībian|oeste (lado)
+西|xī|oeste
+体育馆|tǐyùguǎn|gimnasio; estadio
+体育|tǐyù|educación física; entrenamiento físico
+里边|lǐbian|en; dentro de
+里|lǐ|en; dentro de
+银行|yínháng|banco
+东边|dōngbian|este (lado)
+东|dōng|este
+宿舍|sùshè|dormitorio (residencia de estudiantes)
+教学|jiàoxué|enseñanza y aprendizaje
+先|xiān|primero; antes (adv.)
+别|bié|no (para prohibir: «no hagas…»)
+着急|zháojí|preocupado; ansioso
+小姐|xiǎojiě|señora; señorita
+地方|dìfang|lugar; región
+知道|zhīdào|saber
+超市|chāoshì|supermercado
+前边|qiánbian|frente a; delante de
+前|qián|delante
+对面|duìmiàn|opuesto; enfrente de
+饭馆|fànguǎn|restaurante
+马路|mǎlù|carretera; calle
+路|lù|carretera; camino; calle
+过|guò|cruzar; pasar
+后边|hòubian|atrás; detrás; posterior
+后|hòu|atrás
+条|tiáo|clasificador para cosas largas y estrechas (ríos, calles, pantalones…)
+胡同|hútòng|hutong; callejón
+等|děng|esperar
+街道|jiēdào|calle
+街|jiē|calle
+老|lǎo|viejo
+卫生间|wèishēngjiān|cuarto de baño
+卧室|wòshì|dormitorio (de una casa)
+客厅|kètīng|salón
+阳台|yángtái|balcón
+厨房|chúfáng|cocina
+书房|shūfáng|cuarto de estudio
+咖啡厅|kāfēitīng|cafetería; café
+酒吧|jiǔbā|bar
+清真餐厅|qīngzhēn cāntīng|restaurante musulmán; restaurante halal
+操场|cāochǎng|campo deportivo
+那儿|nàr|allí
+左边|zuǒbian|izquierda (lado)
+上边|shàngbian|arriba; encima de
+下边|xiàbian|abajo; debajo; debajo de
+外边|wàibian|afuera`;
+LEX_RAW.trim().split("\n").forEach(l=>{const[h,p,m]=l.split("|");if(!BY[h])BY[h]={h,p,m,lv:0}});
 const PUNCT2="，。？！：、“”「」";
 function segment(s){const T=[];let i=0;
   while(i<s.length){let hit=false;
@@ -1806,9 +1891,70 @@ function bindSay(){
     try{r.start()}catch(e){listening=false;heard={err:"No he podido activar el micrófono."};sentView()}};
 }
 
+
+/* ---------- Buscar ---------- */
+let lookQ="",lookSel=null;
+const HAN=/[㐀-鿿]/;
+const deacc=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const uu=s=>s.replace(/ü/g,"u");
+const toneSeq=s=>[...s].map(c=>REV[c]?REV[c][1]:/[1-4]/.test(c)?+c:0).filter(Boolean).join("");
+const lvOrd=w=>w.lv||9;
+const byLv=(a,b)=>lvOrd(a)-lvOrd(b)||a.h.length-b.h.length||a.p.localeCompare(b.p);
+const tagOf=w=>w.lv?`HSK ${w.lv}`:"Otras";
+function lookup(q){q=q.trim();const G=[],seen=new Set(),W=Object.values(BY);
+  const add=(label,list,max=40)=>{list=list.filter(w=>!seen.has(w.h)).sort(byLv).slice(0,max);list.forEach(w=>seen.add(w.h));if(list.length)G.push({label,list})};
+  if(!q)return G;
+  if(HAN.test(q)){const qh=[...q].filter(c=>HAN.test(c)).join("");
+    add("Esta palabra",BY[qh]?[BY[qh]]:[]);
+    add("Palabras que la contienen",W.filter(w=>w.h.includes(qh)));
+    const cs=[...new Set([...qh])];
+    add("Comparten algún carácter",W.filter(w=>cs.some(c=>w.h.includes(c))));
+    const look=new Set();cs.forEach(c=>(SG[c]||[]).forEach(g=>[...SIM[g]].forEach(x=>{if(!cs.includes(x))look.add(x)})));
+    add("Caracteres que se parecen",W.filter(w=>[...look].some(c=>w.h.includes(c))));
+    return G}
+  const s=q.toLowerCase().replace(/v/g,"ü"),qb=uu(bare(s.replace(/[0-9]/g,""))),qt=toneSeq(s);
+  if(qb){const K=W.map(w=>[w,uu(bare(w.p)),toneSeq(w.p)]);
+    if(qt){add("Con esos tonos",K.filter(([w,b,t])=>b===qb&&t===qt).map(x=>x[0]));
+      add("Mismo sonido, otros tonos",K.filter(([w,b])=>b===qb).map(x=>x[0]))}
+    else add("Se pronuncian así (cualquier tono)",K.filter(([w,b])=>b===qb).map(x=>x[0]));
+    add("Empiezan igual",K.filter(([w,b])=>b.startsWith(qb)).map(x=>x[0]),24)}
+  const parts=q.split(/[\s,]+/).filter(Boolean);
+  if(!G.length&&parts.length>1)parts.forEach(pt=>lookup(pt).forEach(g=>add(`«${pt}» · ${g.label.toLowerCase()}`,g.list,16)));
+  const d=deacc(q);if(d.length>=3&&!/[0-9]/.test(d))add(`Significado con «${q}»`,W.filter(w=>deacc(w.m).split(/[^a-zñ]+/).some(x=>x.startsWith(d))),24);
+  return G}
+function similarTo(w){const out=new Map(),b=uu(bare(w.p));
+  Object.values(BY).forEach(o=>{if(o.h!==w.h&&uu(bare(o.p))===b)out.set(o.h,o)});
+  [...w.h].forEach(c=>(SG[c]||[]).forEach(g=>[...SIM[g]].forEach(x=>{if(x!==c&&BY[x])out.set(x,BY[x])})));
+  return [...out.values()].sort(byLv).slice(0,10)}
+function lookView(){
+  stage.innerHTML=`<div class="look">
+    <input id="lkIn" class="lkin" type="search" enterkeyhint="search" placeholder="ni hao · ni3 hao3 · 你好 · hola" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Palabra a buscar" value="${esc(lookQ)}">
+    <div class="hint" style="text-align:left">Pinyin con o sin tonos (ma3 = mǎ), caracteres o una palabra en castellano. Elige la que buscas para ver qué significa.</div>
+    <div id="lkDet"></div><div id="lkRes"></div></div>`;
+  const inp=$("lkIn");inp.oninput=()=>{lookQ=inp.value;lookSel=null;drawLook()};
+  inp.onkeydown=e=>{if(e.key==="Enter")inp.blur()};
+  if(!lookQ)setTimeout(()=>inp.focus(),50);
+  drawLook()}
+function drawLook(){
+  const det=$("lkDet"),res=$("lkRes");if(!det)return;
+  const w=lookSel&&BY[lookSel];
+  if(w){const sim=similarTo(w);
+    det.innerHTML=`<div class="card lkcard"><span class="lvl">${tagOf(w)}</span><button class="speak" data-say="${esc(w.h)}" aria-label="Escuchar pronunciación">${icon}</button>
+      <div class="han ${w.h.length>2?"long":""}">${w.h}</div><div class="py">${esc(w.p)}</div><div class="mean">${esc(w.m)}</div>
+      <div class="chips" style="justify-content:center"><button class="chip" data-strokes="${esc(w.h)}">✍ Cómo se escribe</button><button class="chip" data-say="${esc(w.h)}">🔊 Escuchar</button></div>
+      ${exHTML(w.h)}
+      ${sim.length?`<div class="exs"><div class="exl">No la confundas con</div><div class="lkgrid">${sim.map(o=>`<button class="lkr" data-h="${esc(o.h)}"><span class="lkh">${o.h}</span><span class="lkp">${esc(o.p)}</span><span class="lkm">${esc(o.m)}</span></button>`).join("")}</div></div>`:""}
+      <button class="link" id="lkBack">← Volver a las opciones</button></div>`;
+    $("lkBack").onclick=()=>{lookSel=null;drawLook();$("lkIn").scrollIntoView({block:"start",behavior:"smooth"})};
+    res.innerHTML="";
+  }else{det.innerHTML="";
+    const G=lookup(lookQ);
+    res.innerHTML=!lookQ.trim()?"":!G.length?`<div class="empty">No encuentro «${esc(lookQ.trim())}» en el vocabulario de la app.<br><a href="https://www.mdbg.net/chinese/dictionary?page=worddict&wdqb=${encodeURIComponent(lookQ.trim())}" target="_blank" rel="noopener">Buscarla en MDBG</a> (diccionario en inglés)</div>`
+      :G.map(g=>`<div class="lkgrp"><div class="exl">${esc(g.label)} · ${g.list.length}</div><div class="lkgrid">${g.list.map(o=>`<button class="lkr" data-h="${esc(o.h)}"><span class="lkh">${o.h}</span><span class="lkp">${esc(o.p)}</span><span class="lkt">${tagOf(o)}</span></button>`).join("")}</div></div>`).join("")}
+  stage.querySelectorAll(".lkr").forEach(b=>b.onclick=()=>{lookSel=b.dataset.h;drawLook();autoSpeak(lookSel);$("lkDet").scrollIntoView({block:"start",behavior:"smooth"})})}
 /* ---------- Inicio ---------- */
 const levelName=()=>S.level?`HSK ${S.level}`:"HSK 1 y 2";
-const SECTIONS={cards:"Tarjetas",quiz:"Tests",topics:"Temas",sent:"Traducir",read:"Lecturas",fails:"Fallos",more:"Ajustes"};
+const SECTIONS={look:"Buscar",cards:"Tarjetas",quiz:"Tests",topics:"Temas",sent:"Traducir",read:"Lecturas",fails:"Fallos",more:"Ajustes"};
 function homeView(){
   const {due,nw}=dailyList(),nd=due.length+nw.length,nf=Object.keys(S.fails).length,nr=Object.keys(S.read).filter(k=>S.read[k]).length;
   const R=S.run&&S.run.pos<S.run.words.length?S.run:null;
@@ -1817,6 +1963,7 @@ function homeView(){
     ${R?`<div class="resume"><div><b>Continuar test</b><span>${esc(R.label)} · ${R.pos}/${R.words.length}</span></div><button class="btn" id="resumeBtn">Seguir</button></div>`:""}
     <div class="daily"><div><b>Repaso de hoy</b><span>${nd?`${due.length} para repasar · ${nw.length} nuevas`:"Hecho por hoy. Vuelve mañana."}</span></div>${nd?`<button class="btn yes" id="dailyBtn">Empezar</button>`:""}</div>
     <div class="tiles">
+      <button class="tile" data-go="look"><span class="ic">查</span><b>Buscar</b><span>Escribe pinyin o 汉字 y elige</span></button>
       <button class="tile" data-go="cards"><span class="ic">卡</span><b>Tarjetas</b><span>Repasa palabra a palabra</span></button>
       <button class="tile" data-go="quiz"><span class="ic">考</span><b>Tests</b><span>Por bloques, en 5 modos</span></button>
       <button class="tile" data-go="topics"><span class="ic">类</span><b>Temas</b><span>Números, comida, transporte…</span></button>
@@ -1844,7 +1991,7 @@ function render(){
   $("moreSec").hidden=S.mode!=="more";$("stage").hidden=S.mode==="more";
   if(S.mode==="more"){$("bkOut").value=exportCode();$("bkMsg").textContent="";syncSound()}
   if(S.mode==="home")homeView();else if(S.mode==="cards")cards();else if(S.mode==="quiz")quiz();else if(S.mode==="topics")topicsView();else if(S.mode==="sent")sentView();
-  else if(S.mode==="read")(S.story?reader():readList());else if(S.mode==="fails")failsView();
+  else if(S.mode==="read")(S.story?reader():readList());else if(S.mode==="fails")failsView();else if(S.mode==="look")lookView();
   stats();
 }
 let navDepth=0;
