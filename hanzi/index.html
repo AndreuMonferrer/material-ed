@@ -149,6 +149,11 @@ rt{font-family:var(--ui);font-size:12px;color:var(--jade);font-weight:600;letter
 .hw{font-size:24px;line-height:1.35}
 .nopy .pyw{display:none}
 .w.sel{background:var(--jade-soft)}
+.w.hard .hw{color:var(--seal);font-weight:700}
+.lbl{display:flex;flex-direction:column;gap:6px;font:600 13px var(--ui);color:var(--muted);text-align:left}
+.fld{width:100%;box-sizing:border-box;font:16px/1.5 var(--ui);border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 12px;resize:vertical;word-break:normal}
+.fld.zhf{font-family:var(--han);font-size:18px}
+.mtabs{margin-bottom:12px}
 .w.saved .hw{text-decoration:underline dotted var(--seal);text-underline-offset:5px}
 .blank{display:inline-block;min-width:2.2em;border-bottom:2px solid var(--jade);margin:0 3px;color:var(--jade);text-align:center}
 .daily{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--jade-soft);border:1px solid var(--jade);border-radius:16px;padding:14px 16px}
@@ -280,6 +285,16 @@ textarea{width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid 
     <button class="btn" id="shStroke">Trazos</button>
   </div>
   <button class="btn yes wide" id="shSave">Guardar para estudiar</button>
+  <button class="btn wide" id="shHard" hidden>Marcar como difícil</button>
+  <div class="row" id="shMine" hidden style="width:100%">
+    <button class="btn" id="shJoin">Unir con la siguiente</button>
+    <button class="btn" id="shEdit">Editar significado</button>
+  </div>
+  <div id="shEditBox" hidden style="width:100%;flex-direction:column;gap:8px">
+    <input class="fld" id="shP" placeholder="Pinyin (p. ej. hànbǎobāo)" autocomplete="off">
+    <input class="fld" id="shM" placeholder="Significado en castellano" autocomplete="off">
+    <button class="btn yes wide" id="shEditOk">Guardar significado</button>
+  </div>
 </div>
 
 <script>
@@ -1416,7 +1431,76 @@ Object.assign(EXTRA,{晚:["wǎn","tarde"],晚饭:["wǎnfàn","cena"],楼:["lóu"
 Object.assign(EXTRA,{车:["chē","coche"],国:["guó","país"],下面:["xiàmian","debajo"],外面:["wàimian","fuera"],条:["tiáo","clasificador (cosas largas)"],跑:["pǎo","correr"],这儿:["zhèr","aquí"],学生们:["xuéshengmen","estudiantes"],孩子们:["háizimen","niños"],没:["méi","no (en pasado)"]});
 for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
 /* Vocabulario del libro de clase (lección 6) para el buscador */
-const LEX_RAW=`你好|nǐ hǎo|hola
+const LEX_RAW=`小胖|Xiǎopàng|Xiaopang («Gordito»)
+才|cái|solo, apenas; no... hasta
+身高|shēngāo|estatura
+体重|tǐzhòng|peso (corporal)
+公斤|gōngjīn|kilo(gramo)
+米|mǐ|metro
+肉|ròu|carne
+猪肉|zhūròu|carne de cerdo
+牛肉|niúròu|carne de ternera
+羊肉|yángròu|carne de cordero
+鱼肉|yúròu|carne de pescado
+猪|zhū|cerdo
+土豆|tǔdòu|patata
+甜品|tiánpǐn|postre, dulce
+比如|bǐrú|por ejemplo
+薯条|shǔtiáo|patatas fritas (bastones)
+炸薯条|zhá shǔtiáo|patatas fritas
+炸|zhá|freír
+冰激凌|bīngjīlíng|helado
+冰淇淋|bīngqílín|helado
+冰|bīng|hielo
+一次|yí cì|una vez, de una vez
+汉堡包|hànbǎobāo|hamburguesa
+汉堡|hànbǎo|hamburguesa
+包|bāo|bolsa, paquete (clasificador)
+可口可乐|Kěkǒu Kělè|Coca-Cola
+蔬菜|shūcài|verdura
+每天|měitiān|cada día
+以前|yǐqián|antes
+偷偷|tōutōu|a escondidas
+冰箱|bīngxiāng|nevera
+别人|biérén|los demás, otra gente
+胖|pàng|gordo
+瘦|shòu|delgado
+愿意|yuànyì|querer, estar dispuesto a
+踢球|tī qiú|jugar al fútbol
+踢|tī|dar patadas
+伤心|shāngxīn|triste, dolido
+爷爷|yéye|abuelo (paterno)
+奶奶|nǎinai|abuela (paterna)
+减肥|jiǎnféi|adelgazar, hacer dieta
+学会|xuéhuì|aprender (a hacer algo)
+至少|zhìshǎo|al menos
+种|zhǒng|tipo, clase (clasificador)
+不同|bùtóng|diferente
+梨|lí|pera
+香蕉|xiāngjiāo|plátano
+很多|hěn duō|mucho(s)
+绿色|lǜsè|verde
+打球|dǎ qiú|jugar a la pelota
+等等|děngděng|etcétera
+参加|cānjiā|participar, unirse a
+足球|zúqiú|fútbol
+足球队|zúqiú duì|equipo de fútbol
+队|duì|equipo
+健康|jiànkāng|sano; salud
+感觉|gǎnjué|sensación; sentir
+被|bèi|por (pasiva)
+马路|mǎlù|calle, carretera
+街|jiē|calle
+一起|yìqǐ|juntos
+东西|dōngxi|cosa
+睡觉|shuìjiào|dormir
+晚上|wǎnshang|noche
+小时|xiǎoshí|hora
+分钟|fēnzhōng|minuto
+运动|yùndòng|deporte, hacer ejercicio
+跑步|pǎobù|correr
+游泳|yóuyǒng|nadar
+你好|nǐ hǎo|hola
 新|xīn|nuevo (adj.)
 同学|tóngxué|compañero de clase; compañero de escuela
 食堂|shítáng|comedor
@@ -1490,7 +1574,7 @@ LEX_RAW.trim().split("\n").forEach(l=>{const[h,p,m]=l.split("|");if(!BY[h])BY[h]
 const PUNCT2="，。？！：、“”「」";
 function segment(s){const T=[];let i=0;
   while(i<s.length){let hit=false;
-    for(let L=4;L>=1;L--){const sub=s.substr(i,L);
+    for(let L=6;L>=1;L--){const sub=s.substr(i,L);
       if(L===1&&PUNCT2.includes(sub)){T.push({pu:sub});i++;hit=true;break}
       if(BY[sub]){T.push({h:sub,p:BY[sub].p,m:BY[sub].m});i+=L;hit=true;break}}
     if(!hit){T.push({h:s[i],p:"",m:""});i++}}
@@ -1522,13 +1606,15 @@ const KEY="hanzi-hsk12-v1";
 let S={box:{},level:1,mode:"home",smode:"ord",tpy:false,dir:"ht",fails:{},fok:{},srs:{},best:{},run:null,read:{},py:true,tr:false,story:null,cardSet:null};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
 if(!S.fails)S.fails={};if(!S.fok)S.fok={};if(!S.srs)S.srs={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
+if(!Array.isArray(S.mine))S.mine=[];if(!S.hard)S.hard={};if(!S.mydict)S.mydict={};
+for(const[h,[p,m]]of Object.entries(S.mydict))BY[h]=Object.assign(BY[h]||{h,lv:0},{p,m});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 let sess={ok:0,bad:0,streak:0},cur=null,revealed=false,lastH=null,answered=false;
 
 const boxOf=w=>S.box[w.h]||0;
 const failWords=()=>Object.keys(S.fails).map(h=>BY[h]).filter(Boolean);
-const setWords=k=>k==="fails"?failWords():k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].words.map(h=>BY[h]).filter(w=>!S.level||w.lv===S.level):[];
-const setLabel=k=>k==="fails"?"Mis fallos":k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].label:"";
+const setWords=k=>k&&k.startsWith("h:")?(S.hard[k.slice(2)]||[]).map(h=>BY[h]).filter(w=>w&&w.m):k==="fails"?failWords():k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].words.map(h=>BY[h]).filter(w=>!S.level||w.lv===S.level):[];
+const setLabel=k=>k&&k.startsWith("h:")?"Difíciles · "+((S.mine.find(x=>x.id===k.slice(2))||{}).t||""):k==="fails"?"Mis fallos":k&&k.startsWith("t:")&&TOPIC[k.slice(2)]?TOPIC[k.slice(2)].label:"";
 const levelWords=()=>ALL.filter(w=>!S.level||w.lv===S.level);
 const pool=()=>{if(S.mode==="cards"&&S.cardSet){const f=setWords(S.cardSet);if(f.length)return f}return levelWords()};
 const lvTag=w=>w.lv?`HSK ${w.lv}`:"Lectura";
@@ -1720,7 +1806,7 @@ function sandhi(T){T.forEach((x,i)=>{if(x.pu||x.ov||(x.h!=="不"&&x.h!=="一"))r
   const pv=T[i-1];if(x.h==="一"&&((pv&&!pv.pu&&/[十第月]$/.test(pv.h))||(n&&!n.pu&&/^[日号月]/.test(n.h)))){x.p="yī";return}
   x.p=x.h==="不"?(tn===4?"bú":"bù"):(tn===-1?"yī":tn===4?"yí":"yì")});return T}
 function wordLine(T){sandhi(T);
-  const cell=x=>x.pu?`<span class="w pu"><span class="pyw">\u00a0</span><span class="hw">${x.pu}</span></span>`:`<span class="w${S.fails[x.h]?" saved":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}"><span class="pyw">${esc(x.p)||"\u00a0"}</span><span class="hw">${x.h}</span></span>`;
+  const cell=x=>x.pu?`<span class="w pu"><span class="pyw">\u00a0</span><span class="hw">${x.pu}</span></span>`:`<span class="w${S.fails[x.h]?" saved":""}${HARDSET&&HARDSET.has(x.h)?" hard":""}" data-h="${x.h}" data-p="${esc(x.p)}" data-m="${esc(x.m)}"><span class="pyw">${esc(x.p)||"\u00a0"}</span><span class="hw">${x.h}</span></span>`;
   const groups=[];let g=null,lead=[];
   T.forEach(x=>{if(x.pu&&"「“".includes(x.pu)){lead.push(x);return}
     if(x.pu){(g||(g=[],groups.push(g),g)).push(x);return}
@@ -1729,12 +1815,97 @@ function wordLine(T){sandhi(T);
   return groups.map(gr=>`<span class="grp">${gr.map(cell).join("")}</span>`).join("")}
 function bindWords(el){const open=e=>{const w=e.target.closest(".w[data-h]");if(!w)return;e.preventDefault();openSheet(w)};
   el.addEventListener("click",open);el.addEventListener("contextmenu",open)}
+let HARDSET=null;
+const mineSt=id=>S.mine.find(x=>x.id===id);
+const mineCtx=()=>S.mode==="read"&&typeof S.story==="string"&&S.story[0]==="m"?S.story.split("/")[0]:null;
 function readList(){
-  const list=STORIES.filter(s=>!S.level||s.lv===S.level);
-  stage.innerHTML=`<div class="stories">${list.map(s=>`<button class="story" data-id="${s.id}"><span class="tag">HSK ${s.lv}</span><b class="zh">${s.t}</b><span>${esc(s.es)}</span><span class="meta">${s.s.length} frases${S.read[s.id]?" · <em>Leída</em>":""}</span></button>`).join("")}</div>`;
+  const tab=S.rtab==="mine"?"mine":"hsk";
+  const tabs=`<div class="seg mtabs" id="rTab"><button data-t="hsk" aria-pressed="${tab==="hsk"}">Lecturas HSK</button><button data-t="mine" aria-pressed="${tab==="mine"}">Mis cuentos${S.mine.length?" ("+S.mine.length+")":""}</button></div>`;
+  if(tab==="mine"){
+    stage.innerHTML=tabs+`<div class="stories"><button class="btn yes wide" id="addSt">+ Añadir un cuento</button>
+      ${S.mine.length?S.mine.map(s=>{const nh=(S.hard[s.id]||[]).length;return `<button class="story" data-id="${s.id}"><span class="tag">Mío</span><b class="zh">${esc(s.t)}</b>${s.es?`<span>${esc(s.es)}</span>`:""}<span class="meta">${s.s.length} frases${nh?` · ${nh} difíciles`:""}${S.read[s.id]?" · <em>Leído</em>":""}</span></button>`}).join(""):`<div class="panel"><div class="empty">Aquí puedes guardar tus propios cuentos, por ejemplo los de clase.<br>Se guardan solo en este móvil, no se suben a internet.</div></div>`}</div>`;
+    $("addSt").onclick=()=>{S.story="new";go("read")};
+  }else{
+    const list=STORIES.filter(s=>!S.level||s.lv===S.level);
+    stage.innerHTML=tabs+`<div class="stories">${list.map(s=>`<button class="story" data-id="${s.id}"><span class="tag">HSK ${s.lv}</span><b class="zh">${s.t}</b><span>${esc(s.es)}</span><span class="meta">${s.s.length} frases${S.read[s.id]?" · <em>Leída</em>":""}</span></button>`).join("")}</div>`;
+  }
+  stage.querySelectorAll("#rTab button").forEach(b=>b.onclick=()=>{S.rtab=b.dataset.t;save();readList()});
   stage.querySelectorAll(".story").forEach(b=>b.onclick=()=>{S.story=b.dataset.id;go("read")});
 }
+function normZhText(t){return t.replace(/\r/g,"").replace(/([㐀-鿿])\s+(?=[㐀-鿿])/g,"$1")
+  .replace(/([㐀-鿿])\s*,/g,"$1，").replace(/([㐀-鿿])\s*\./g,"$1。").replace(/([㐀-鿿])\s*!/g,"$1！").replace(/([㐀-鿿])\s*\?/g,"$1？").replace(/([㐀-鿿])\s*:/g,"$1：")
+  .replace(/"([^"]*)"/g,"“$1”")}
+const stripNum=l=>l.replace(/^\s*\d+\s*[.、,，)）:]?\s*/,"").trim();
+function splitZh(t){let L=normZhText(t).split("\n").map(stripNum).filter(Boolean);
+  if(L.length===1)L=(L[0].match(/[^。！？]+[。！？”」]*/g)||[]).map(x=>x.trim()).filter(Boolean);return L}
+const splitTr=t=>t.replace(/\r/g,"").split("\n").map(stripNum).filter(Boolean);
+function myEdit(id){const st=id?mineSt(id):null;
+  stage.innerHTML=`<div class="panel">
+    <div class="top"><button class="link" id="edBack">← Cancelar</button><span class="tag">${st?"Editar cuento":"Nuevo cuento"}</span></div>
+    <label class="lbl">Título en chino<input class="fld zhf" id="edT" autocomplete="off" placeholder="我的故事"></label>
+    <label class="lbl">Título en castellano (opcional)<input class="fld" id="edEs" autocomplete="off"></label>
+    <label class="lbl">Texto en chino<textarea class="fld zhf" id="edZh" rows="10" placeholder="Una frase (o una página) por línea. Puedes pegar el texto copiado con Google Lens; los números del principio se quitan solos."></textarea></label>
+    <label class="lbl">Traducción (opcional)<textarea class="fld" id="edTr" rows="8" placeholder="Una línea por cada línea del texto en chino, en el mismo orden."></textarea></label>
+    <div class="hint" style="text-align:left" id="edInfo"></div>
+    <button class="btn yes wide" id="edSave">Guardar cuento</button>
+    <div class="hint" style="text-align:left">Se guarda solo en este móvil. Para llevarlo a otro dispositivo, usa la copia de seguridad de Ajustes.</div>
+  </div>`;
+  if(st){$("edT").value=st.t;$("edEs").value=st.es||"";$("edZh").value=st.s.map(x=>x[0]).join("\n");$("edTr").value=st.s.map(x=>x[1]||"").join("\n")}
+  const info=()=>{const n=splitZh($("edZh").value).length,m=splitTr($("edTr").value).length;
+    $("edInfo").textContent=n?`${n} ${n===1?"frase":"frases"}${m?` · ${m} ${m===1?"línea":"líneas"} de traducción${m!==n?" (no coinciden: revisa que haya una por frase)":""}`:""}`:""};
+  $("edZh").oninput=info;$("edTr").oninput=info;info();
+  $("edBack").onclick=()=>history.back();
+  $("edSave").onclick=()=>{const t=$("edT").value.trim(),L=splitZh($("edZh").value),T=$("edTr").value.split("\n").filter(x=>x.trim()).map(stripNum);
+    if(!L.length){$("edInfo").textContent="Pega o escribe el texto en chino.";return}
+    const nid=st?st.id:"m"+Date.now().toString(36);
+    const obj={id:nid,t:t||L[0].slice(0,8),es:$("edEs").value.trim(),s:L.map((z,i)=>[z,T[i]||""])};
+    if(st)S.mine[S.mine.indexOf(st)]=obj;else S.mine.unshift(obj);
+    S.rtab="mine";S.story=nid;save();if(st){history.back();return}try{history.replaceState({mode:"read",story:nid,d:navDepth},"")}catch(e){}render();window.scrollTo(0,0)};
+}
+function myReader(id){const st=mineSt(id),H=S.hard[id]||[];HARDSET=new Set(H);
+  const sent=st.s.map(([zh,es])=>{const T=segment(zh).map(x=>Object.assign({},x));const line=wordLine(T);
+    return `<div class="sent"><div class="zhline">${line}</div><button class="x" data-say="${esc(zh)}" aria-label="Escuchar la frase">${icon}</button>${es?`<div class="tr">${esc(es)}</div>`:""}</div>`}).join("");
+  HARDSET=null;
+  stage.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+    <div class="top"><button class="link" id="back2">← Mis cuentos</button><span class="tag">Mío</span></div>
+    <div><div class="han" style="font-size:30px;text-align:left;font-weight:700">${esc(st.t)}</div>${st.es?`<div class="hint" style="text-align:left">${esc(st.es)}</div>`:""}</div>
+    <div class="chips"><button class="chip" id="tPy" aria-pressed="${S.py}">Pinyin</button><button class="chip" id="tTr" aria-pressed="${S.tr}">Traducción</button></div>
+    <div class="hint" style="text-align:left">Toca una palabra para ver qué significa y marcarla como difícil. Las difíciles salen en rojo.</div>
+    <div class="text ${S.py?"":"nopy"} ${S.tr?"":"notr"}" id="txt">${sent}</div>
+    <button class="btn yes wide" id="hardBtn"></button>
+    <button class="btn ${S.read[id]?"":"yes"} wide" id="done">${S.read[id]?"Leído ✓":"Marcar como leído"}</button>
+    <div class="row"><button class="btn" id="edit">Editar</button><button class="btn" id="del">Borrar</button></div>
+    <div class="row" id="delConf" hidden><button class="btn no" id="delYes">Sí, borrar el cuento</button><button class="btn" id="delNo">No</button></div>
+  </div>`;
+  syncHardBtn(id);
+  $("back2").onclick=()=>{S.rtab="mine";if(history.state&&history.state.story){history.back()}else{S.story=null;save();render()}};
+  $("tPy").onclick=()=>{S.py=!S.py;save();$("tPy").setAttribute("aria-pressed",S.py);$("txt").classList.toggle("nopy",!S.py)};
+  $("tTr").onclick=()=>{S.tr=!S.tr;save();$("tTr").setAttribute("aria-pressed",S.tr);$("txt").classList.toggle("notr",!S.tr)};
+  $("done").onclick=()=>{S.read[id]=!S.read[id];save();myReader(id)};
+  $("hardBtn").onclick=()=>{S.story=id+"/hard";go("read")};
+  $("edit").onclick=()=>{S.story=id+"/edit";go("read")};
+  $("del").onclick=()=>{$("delConf").hidden=false};$("delNo").onclick=()=>{$("delConf").hidden=true};
+  $("delYes").onclick=()=>{S.mine=S.mine.filter(x=>x.id!==id);delete S.hard[id];delete S.read[id];S.rtab="mine";S.story=null;save();history.back()};
+  bindWords($("txt"));
+}
+function syncHardBtn(id){const b=$("hardBtn");if(!b)return;const n=(S.hard[id]||[]).length;b.textContent=`Palabras difíciles del cuento (${n})`}
+function hardView(id){const st=mineSt(id),words=(S.hard[id]||[]).map(h=>BY[h]||{h,p:"",m:""});
+  stage.innerHTML=`<div class="panel">
+    <div class="top"><button class="link" id="hBack">← ${esc(st.t)}</button><span class="tag">Difíciles</span></div>
+    ${words.length?`<div class="row"><button class="btn no" id="hTest">Test</button><button class="btn" id="hCards">Tarjetas</button></div>
+    <div class="list">${words.map(w=>`<div class="item"><span class="h">${w.h}</span><div class="t"><div>${esc(w.p)}</div><div>${esc(w.m)||"<i>sin significado: edítalo desde el cuento</i>"}</div></div><div style="display:flex"><button class="x" data-strokes="${w.h}" aria-label="Orden de trazos">✍</button><button class="x" data-say="${w.h}" aria-label="Escuchar">${icon}</button><button class="x" data-rmh="${w.h}" aria-label="Quitar de la lista">Quitar</button></div></div>`).join("")}</div>`
+    :`<div class="empty">Aún no has marcado ninguna palabra difícil.<br>Toca una palabra del cuento y pulsa «Marcar como difícil».</div>`}
+  </div>`;
+  $("hBack").onclick=()=>history.back();
+  const ok=words.filter(w=>BY[w.h]&&w.m);
+  if(words.length){$("hTest").onclick=()=>{if(ok.length)askMode(ok,"Difíciles · "+st.t,"h:"+id)};
+    $("hCards").onclick=()=>{if(!ok.length)return;S.cardSet="h:"+id;cur=null;go("cards")}}
+  stage.querySelectorAll("[data-rmh]").forEach(b=>b.onclick=()=>{S.hard[id]=(S.hard[id]||[]).filter(h=>h!==b.dataset.rmh);save();hardView(id)});
+}
 function reader(){
+  if(S.story==="new")return myEdit(null);
+  if(S.story[0]==="m"){const[id,sub]=S.story.split("/");if(!mineSt(id)){S.story=null;return readList()}
+    return sub==="edit"?myEdit(id):sub==="hard"?hardView(id):myReader(id)}
   const st=STORIES.find(x=>x.id===S.story);if(!st){S.story=null;return readList()}
   const sent=st.s.map(([zh,es])=>{const T=zh.split(" ").map(tok);
     const line=wordLine(T);
@@ -1759,12 +1930,25 @@ function openSheet(el){
   const h=el.dataset.h,d=BY[h];
   $("shTag").textContent=d&&d.lv?`HSK ${d.lv}`:"Fuera de HSK 1-2";
   $("shHan").textContent=h;$("shPy").textContent=el.dataset.p;$("shMean").textContent=el.dataset.m;
+  const mid=mineCtx();$("shHard").hidden=!mid;$("shMine").hidden=!mid;$("shEditBox").hidden=true;$("shEditBox").style.display="none";
+  if(mid){syncHard();if(!el.dataset.m)$("shMean").textContent="(sin significado: pulsa «Editar significado»)";
+    const all=[...el.closest(".sent").querySelectorAll(".w")],n=all[all.indexOf(el)+1];$("shJoin").disabled=!(n&&n.dataset.h)}
   syncSave();$("sheet").hidden=false;$("sheetBg").hidden=false;autoSpeak(h);
 }
 function syncSave(){const h=shEl.dataset.h,b=$("shSave");const on=!!S.fails[h];b.textContent=on?"Guardada ✓ (quitar)":"Guardar para estudiar";b.className="btn "+(on?"":"yes")}
+function syncHard(){const id=mineCtx(),h=shEl.dataset.h,b=$("shHard"),on=(S.hard[id]||[]).includes(h);b.textContent=on?"Difícil ✓ (quitar)":"Marcar como difícil";b.className="btn wide "+(on?"no":"")}
 function closeSheet(){$("sheet").hidden=true;$("sheetBg").hidden=true;if(shEl)shEl.classList.remove("sel")}
 $("sheetBg").onclick=closeSheet;$("sheetClose").onclick=closeSheet;
 $("shSay").onclick=()=>speak(shEl.dataset.h);
+$("shHard").onclick=()=>{const id=mineCtx(),h=shEl.dataset.h;if(!id)return;const L=S.hard[id]||(S.hard[id]=[]);const i=L.indexOf(h);if(i>=0)L.splice(i,1);else L.push(h);save();syncHard();syncHardBtn(id);
+  document.querySelectorAll(`#txt .w[data-h="${h}"]`).forEach(x=>x.classList.toggle("hard",i<0))};
+$("shEdit").onclick=()=>{const b=$("shEditBox");b.hidden=false;b.style.display="flex";$("shP").value=shEl.dataset.p;$("shM").value=shEl.dataset.m;$("shM").focus()};
+$("shEditOk").onclick=()=>{const h=shEl.dataset.h,p=$("shP").value.trim(),m=$("shM").value.trim();S.mydict[h]=[p,m];BY[h]=Object.assign(BY[h]||{h,lv:0},{p,m});save();closeSheet();render()};
+$("shJoin").onclick=()=>{const all=[...shEl.closest(".sent").querySelectorAll(".w")],n=all[all.indexOf(shEl)+1];if(!n||!n.dataset.h)return;
+  const h=shEl.dataset.h+n.dataset.h;if(h.length>6)return;
+  if(!BY[h]){const p=shEl.dataset.p+n.dataset.p;S.mydict[h]=[p,""];BY[h]={h,p,m:"",lv:0};save()}
+  const si=[...document.querySelectorAll("#txt .sent")].indexOf(shEl.closest(".sent"));closeSheet();render();
+  const sent=document.querySelectorAll("#txt .sent")[si],w=sent&&sent.querySelector(`.w[data-h="${h}"]`);if(w){openSheet(w);if(!w.dataset.m)$("shEdit").onclick()}};
 $("shStroke").onclick=()=>openStrokes(shEl.dataset.h);
 $("shSave").onclick=()=>{const h=shEl.dataset.h;if(S.fails[h])delete S.fails[h];else S.fails[h]=1;delete S.fok[h];save();updateBadge();syncSave();
   document.querySelectorAll(`.w[data-h="${h}"]`).forEach(x=>x.classList.toggle("saved",!!S.fails[h]))};
@@ -1794,7 +1978,7 @@ $("stQuiz").onclick=()=>{if(!stWriter)return;stWriter.hideCharacter();$("stMsg")
   stWriter.quiz({onComplete:s=>{$("stMsg").textContent=s.totalMistakes?`Terminado, con ${s.totalMistakes} ${s.totalMistakes===1?"error":"errores"}.`:"¡Perfecto!"}})};
 
 /* ---------- Copia de seguridad ---------- */
-const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr"];
+const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr","mine","hard","mydict"];
 function exportCode(){const o={};BK_KEYS.forEach(k=>o[k]=S[k]);return "HANZI1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
 let bkArmed=false;
 
@@ -1803,7 +1987,7 @@ $("bkCopy").onclick=()=>{const v=$("bkOut").value;const sel=()=>{$("bkOut").focu
 $("bkLoad").onclick=()=>{let o;try{const raw=$("bkIn").value.trim().replace(/^HANZI1:/,"");o=JSON.parse(decodeURIComponent(escape(atob(raw))));if(!o||typeof o.box!=="object")throw 0}
   catch(e){$("bkMsg").textContent="El código no es válido. Comprueba que lo has copiado entero.";bkArmed=false;$("bkLoad").textContent="Recuperar progreso";return}
   if(!bkArmed){bkArmed=true;$("bkLoad").textContent="¿Seguro? Pulsa otra vez para sustituir";$("bkMsg").textContent="";return}
-  BK_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});["fails","fok","srs","best","read"].forEach(k=>{if(!S[k])S[k]={}});
+  BK_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});["fails","fok","srs","best","read","hard","mydict"].forEach(k=>{if(!S[k])S[k]={}});if(!Array.isArray(S.mine))S.mine=[];for(const[h,[p,m]]of Object.entries(S.mydict))BY[h]=Object.assign(BY[h]||{h,lv:0},{p,m});
   S.run=null;S.story=null;S.cardSet=null;save();bkArmed=false;$("bkLoad").textContent="Recuperar progreso";$("bkIn").value="";
   $("bkOut").value=exportCode();$("bkMsg").textContent="Progreso recuperado.";cur=null;render()};
 
@@ -1968,7 +2152,7 @@ function homeView(){
       <button class="tile" data-go="quiz"><span class="ic">考</span><b>Tests</b><span>Por bloques, en 5 modos</span></button>
       <button class="tile" data-go="topics"><span class="ic">类</span><b>Temas</b><span>Números, comida, transporte…</span></button>
       <button class="tile" data-go="sent"><span class="ic">译</span><b>Traducir</b><span>Ordena frases y dilas en voz alta</span></button>
-      <button class="tile" data-go="read"><span class="ic">读</span><b>Lecturas</b><span>${STORIES.filter(s=>!S.level||s.lv===S.level).length} historias · ${nr} leídas</span></button>
+      <button class="tile" data-go="read"><span class="ic">读</span><b>Lecturas</b><span>${STORIES.filter(s=>!S.level||s.lv===S.level).length} historias${S.mine.length?` · ${S.mine.length} ${S.mine.length===1?"cuento mío":"cuentos míos"}`:""}</span></button>
       <button class="tile" data-go="fails"><span class="ic">错</span><b>Fallos</b><span>${nf?`${nf} ${nf===1?"palabra":"palabras"} para repasar`:"Sin fallos guardados"}</span>${nf?`<span class="badge">${nf}</span>`:""}</button>
       <button class="tile" data-go="more"><span class="ic">设</span><b>Ajustes</b><span>Copia de seguridad</span></button>
     </div></div>`;
