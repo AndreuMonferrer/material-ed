@@ -1432,6 +1432,10 @@ Object.assign(EXTRA,{车:["chē","coche"],国:["guó","país"],下面:["xiàmian
 for(const[h,[p,m]]of Object.entries(EXTRA))if(!BY[h])BY[h]={h,p,m,lv:0};
 /* Vocabulario del libro de clase (lección 6) para el buscador */
 const LEX_RAW=`小胖|Xiǎopàng|Xiaopang («Gordito»)
+只有|zhǐyǒu|solo tener, solo hay
+五十|wǔshí|cincuenta
+四十五|sìshíwǔ|cuarenta y cinco
+三十八|sānshíbā|treinta y ocho
 才|cái|solo, apenas; no... hasta
 身高|shēngāo|estatura
 体重|tǐzhòng|peso (corporal)
@@ -1608,6 +1612,37 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S
 if(!S.fails)S.fails={};if(!S.fok)S.fok={};if(!S.srs)S.srs={};if(!S.best)S.best={};if(!S.read)S.read={};if(S.py==null)S.py=true;
 if(!Array.isArray(S.mine))S.mine=[];if(!S.hard)S.hard={};if(!S.mydict)S.mydict={};
 for(const[h,[p,m]]of Object.entries(S.mydict))BY[h]=Object.assign(BY[h]||{h,lv:0},{p,m});
+/* Cuentos de clase precargados en «Mis cuentos» (solo se añaden una vez; si se borran no vuelven) */
+const SEED_CUENTOS=[{id:"m-xiaopang",t:"小胖",es:"Little Chubby",s:[
+["小胖今年才九岁。","Xiaopang (Gordito) solo tiene nueve años."],
+["身高只有一米三，但是体重有五十公斤。","Mide solo un metro treinta, pero pesa cincuenta kilos."],
+["他非常喜欢吃肉，","Le encanta comer carne:"],
+["猪肉、牛肉、羊肉、鱼肉，什么肉他都喜欢吃。","cerdo, ternera, cordero, pescado… le gusta cualquier carne."],
+["他也很喜欢吃土豆和甜品，比如炸薯条、冰激凌。","También le gustan mucho las patatas y los dulces, como las patatas fritas y el helado."],
+["他一次可以吃四个汉堡包、四包炸薯条。","De una sentada puede comerse cuatro hamburguesas y cuatro bolsas de patatas fritas."],
+["他喜欢喝可口可乐，不喜欢喝水。","Le gusta beber Coca-Cola y no le gusta beber agua."],
+["他不喜欢吃蔬菜和水果。","No le gustan ni la verdura ni la fruta."],
+["每天晚上睡觉以前，他还要偷偷去冰箱找东西吃。","Cada noche, antes de dormir, aún va a escondidas a la nevera a buscar algo de comer."],
+["在马路上，别人都笑他胖。","Por la calle, la gente se ríe de él porque está gordo."],
+["他的同学也不愿意跟他一起踢球。","Sus compañeros tampoco quieren jugar al fútbol con él."],
+["他非常伤心，","Está muy triste,"],
+["就去问爷爷和奶奶。","así que va a preguntar a su abuelo y a su abuela."],
+["奶奶告诉他要减肥，","La abuela le dice que tiene que adelgazar:"],
+["要多吃点儿蔬菜、水果，少吃点儿肉。","que coma más verdura y fruta, y menos carne."],
+["爷爷告诉他每天做四十五分钟到一个小时的运动。","El abuelo le dice que haga entre cuarenta y cinco minutos y una hora de ejercicio cada día."],
+["他听了爷爷的话以后，每天都跑步，","Después de escuchar al abuelo, sale a correr todos los días,"],
+["还跟爷爷学会了游泳。","y además aprende a nadar con él."],
+["他每天至少吃三种不同的水果，比如苹果、梨、香蕉，","Cada día come al menos tres frutas distintas, como manzanas, peras y plátanos,"],
+["还有很多的绿色蔬菜。","y también mucha verdura verde."],
+["晚上睡觉以前两个小时，他不吃东西。","Las dos horas antes de irse a dormir no come nada."],
+["现在他的体重是三十八公斤，不胖了。","Ahora pesa treinta y ocho kilos y ya no está gordo."],
+["在街上，没有人再笑他了。","Por la calle, ya nadie se ríe de él."],
+["现在他还每天都做运动，比如：跑步、游泳、打球等等。","Ahora sigue haciendo ejercicio todos los días: correr, nadar, jugar a la pelota, etc."],
+["他比以前跑得快多了，还参加了学校的足球队。","Corre mucho más rápido que antes y hasta ha entrado en el equipo de fútbol del colegio."],
+["他说：「健康的感觉真好！我再也不想被人叫小胖了。」","Dice: «¡Qué bien se siente uno estando sano! No quiero que nadie me vuelva a llamar Gordito.»"]
+]}];
+if(!S.seeded)S.seeded={};
+for(const c of SEED_CUENTOS)if(!S.seeded[c.id]){S.seeded[c.id]=1;if(!S.mine.some(x=>x.id===c.id))S.mine.push(JSON.parse(JSON.stringify(c)))}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 let sess={ok:0,bad:0,streak:0},cur=null,revealed=false,lastH=null,answered=false;
 
@@ -1978,7 +2013,7 @@ $("stQuiz").onclick=()=>{if(!stWriter)return;stWriter.hideCharacter();$("stMsg")
   stWriter.quiz({onComplete:s=>{$("stMsg").textContent=s.totalMistakes?`Terminado, con ${s.totalMistakes} ${s.totalMistakes===1?"error":"errores"}.`:"¡Perfecto!"}})};
 
 /* ---------- Copia de seguridad ---------- */
-const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr","mine","hard","mydict"];
+const BK_KEYS=["box","fails","fok","srs","best","read","level","dir","py","tr","mine","hard","mydict","seeded"];
 function exportCode(){const o={};BK_KEYS.forEach(k=>o[k]=S[k]);return "HANZI1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
 let bkArmed=false;
 
